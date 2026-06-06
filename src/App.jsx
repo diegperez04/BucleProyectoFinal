@@ -33,13 +33,13 @@ function App() {
 
   return (
     <div>
-      <div>
+      <div className="Menu">
         <Navbar
           seccionActiva={seccionActiva}
           setSeccionActiva={setSeccionActiva}
         />
       </div>
-      <div>
+      <div className="">
         <main>{renderContenidoPrincipal()}</main>
       </div>
     </div>
