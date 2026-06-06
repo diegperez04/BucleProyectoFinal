@@ -1,5 +1,6 @@
 function Menu({ seccionActiva, setSeccionActiva }) {
   const menuItems = [
+    { id: "home", label: "Inicio" },
     { id: "store", label: "Tienda" },
     { id: "volunteering", label: "Voluntariado" },
     { id: "community", label: "Comunidad" },
