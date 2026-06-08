@@ -1,5 +1,11 @@
 function Home() {
-  return <h1>Página en Construcción 🌳</h1>;
+  return (
+    <div>
+      <div className="divuno">
+        <h1>PLATAFORMA DE RECICLAJE Y VOLUNTARIADO</h1>
+      </div>
+    </div>
+  );
 }
 
 export default Home;
