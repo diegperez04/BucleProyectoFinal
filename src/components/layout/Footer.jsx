@@ -1,5 +1,4 @@
 import "./Footer.css";
-
 export default function Footer() {
   return (
     <footer className="footer">
@@ -12,7 +11,6 @@ export default function Footer() {
               cuenta.
             </p>
           </div>
-
           <div className="footer-col">
             <h5>Plataforma</h5>
             <a href="#">Cómo funciona</a>
