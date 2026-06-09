@@ -1,11 +1,12 @@
 import Menu from "../ui/Menu";
+import Logo from "../../assets/BUCLE04-02.jpg";
 
 function Navbar({ seccionActiva, setSeccionActiva }) {
   return (
     <nav>
       <div className="Navbar">
         <div>
-          <h1> TITULO PÁGINA</h1>
+          <img className="LogoInicio" src={Logo} alt="Logo" />
         </div>
         <Menu
           seccionActiva={seccionActiva}
