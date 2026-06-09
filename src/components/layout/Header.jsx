@@ -4,10 +4,9 @@ import Tienda from "../../pages/Tienda";
 import MiPerfil from "../../pages/MiPerfil";
 import Comunidad from "../../pages/Comunidad";
 import ComoFunciona from "../../pages/ComoFunciona";
+import { useState } from "react";
 
 function Header() {
-  import { useState } from "react";
-
   const [seccionActiva, setSeccionActiva] = useState("home");
 
   const renderContenidoPrincipal = () => {
