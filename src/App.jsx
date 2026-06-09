@@ -16,7 +16,7 @@ function App() {
         />
       </div>
       <div className="">
-        <Header />
+        <Header seccionActiva={seccionActiva} />
       </div>
       <div>
         <Footer />
