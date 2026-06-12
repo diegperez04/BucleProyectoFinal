@@ -14,7 +14,10 @@ function Home() {
           <button>Empezar a reciclar</button>
           <button>Ver la tienda</button>
         </div>
-        <div className="divderecha"></div>
+        <div className="divderecha">
+          <h2>Tu progreso este mes</h2>
+          
+        </div>
       </div>
     </div>
   );
