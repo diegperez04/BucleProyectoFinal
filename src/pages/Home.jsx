@@ -16,7 +16,6 @@ function Home() {
         </div>
         <div className="divderecha">
           <h2>Tu progreso este mes</h2>
-          
         </div>
       </div>
     </div>
