@@ -1,0 +1,33 @@
+.cardtienda {
+  width: 150px;
+  border: solid, 1px, black;
+  border-radius: 20px;
+  margin: 30px;
+}
+
+.cardtienda-img {
+  background-color: white;
+  height: 100px;
+  border-bottom: solid 1px black;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Tarjeta {
+  display: flex;
+}
+
+.divtienda-uno {
+  background-color: #0d5b46;
+  height: 335px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+}
+
+.tienda-imagen {
+  width: 900px;
+}
