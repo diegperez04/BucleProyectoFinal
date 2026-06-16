@@ -8,47 +8,84 @@ function Tienda() {
     {
       id: "1",
       title: "Botella Ecológica",
+      category: "Productos sustentables",
       description: "Reutilizable",
-      price: "300",
+      bucles: 300,
       emoji: "💧",
+      bgColor: "verde",
+      ecoTag: true,
     },
     {
       id: "2",
       title: "Tote Bag",
+      category: "Accesorios",
       description: "Bolsa reutilizable",
-      price: "280",
+      bucles: 280,
       emoji: "🛍️",
+      bgColor: "marron",
+    },
+    {
+      id: "3",
+      title: "Cupón 20% off",
+      category: "Supermercado",
+      bucles: 200,
+      emoji: "🛒",
+      bgColor: "verde",
+      ecoTag: true,
+    },
+    {
+      id: "4",
+      title: "Kit limpieza ecológica",
+      category: "Hogar",
+      bucles: 150,
+      emoji: "🧴",
+      bgColor: "mix",
     },
   ];
 
   return (
     <div>
-      <div className="divtienda-uno">
-        <div>
-          <h1>TIENDA VIRTUAL</h1>
-          <h2>
-            Aprovechá los beneficios <br /> por hacer un mundo mejor
-          </h2>
+      //tienda
+      <div className="tienda">
+        <div className="tienda-texto">
+          <p className="tienda-eyebrow">Tienda virtual</p>
+          <h1>
+            Aprovechá los beneficios
+            <br />
+            por hacer un mundo mejor
+          </h1>
+          <p className="tienda-subtitulo">
+            Canjeá tus bucles por productos y descuentos reales.
+          </p>
         </div>
-        <div className="div-imagen">
-          <img className="tienda-imagen" src={Tierra} alt="Tierra" />
+        <div className="tienda-img">
+          <img src={Tierra} alt="Tierra" />
         </div>
       </div>
-      <div className="Tarjeta">
-        {productos.map((producto) => (
-          <Card
-            key={producto.id}
-            type="tienda"
-            {...producto}
-            onCanjear={() => alert("Producto Canjeado")}
-          />
-        ))}
+      //productos
+      <div className="tienda-seccion">
+        <h2 className="tienda-seccion-titulo">Recompensas disponibles</h2>
+        <div className="tienda-grid">
+          {productos.map((producto) => (
+            <Card
+              key={producto.id}
+              type="producto"
+              emoji={producto.emoji}
+              title={producto.title}
+              category={producto.category}
+              bucles={producto.bucles}
+              bgColor={producto.bgColor}
+              ecoTag={producto.ecoTag}
+              onCanjear={() => alert(`¡Canjeaste: ${producto.title}!`)}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
-//Practicando el uso de tarjetas para ver como quedan
+/*Practicando el uso de tarjetas para ver como quedan
 function Home() {
   return (
     <div style={{ padding: "2rem", display: "flex", gap: "1rem" }}>
@@ -77,3 +114,5 @@ function Home() {
   );
 }
 export default Home;
+*/
+export default Tienda;
