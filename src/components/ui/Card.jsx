@@ -1,3 +1,5 @@
+import "./Card.css";
+
 export default function Card(props) {
   if (props.type === "producto") return <CardProducto {...props} />;
   if (props.type === "voluntariado") return <CardVoluntariado {...props} />;
