@@ -1,0 +1,58 @@
+.tienda {
+  background-color: #0d5b47;
+  padding: 3rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.tienda-texto {
+  color: white;
+  max-width: 480px;
+}
+
+.tienda-eyebrow {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 1rem;
+}
+
+.tienda-texto h1 {
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1.25;
+  margin-bottom: 1rem;
+}
+
+.tienda-subtitulo {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.6;
+}
+
+.tienda-img img {
+  width: 380px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.tienda-seccion {
+  padding: 3rem 2.5rem;
+  background: #faf7f2;
+}
+
+.tienda-seccion-titulo {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1c2b26;
+  margin-bottom: 1.5rem;
+}
+
+.tienda-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
