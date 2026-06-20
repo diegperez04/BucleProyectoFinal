@@ -2,6 +2,7 @@ import Card from "../components/ui/Card";
 
 import Tierra from "../assets/Tierra.png";
 import "./Tienda.css";
+import { useState } from "react";
 
 function Tienda() {
   const productos = [
@@ -43,6 +44,19 @@ function Tienda() {
     },
   ];
 
+  const [carrito, setCarrito] = useState([]);
+  const [mostrarCarrito, setMostrarCarrito] = useState(false);
+
+  const agregarAlCarrito = (producto) => {
+    setCarrito((prev) => [...prev, producto]);
+  };
+
+  const total = carrito.reduce((acc, item) => acc + item.bucles, 0);
+
+  const eliminarDelCarrito = (id) => {
+    setCarrito((prev) => prev.filter((item) => item.id !== id));
+  };
+
   return (
     <div>
       //tienda
@@ -64,6 +78,9 @@ function Tienda() {
       </div>
       //productos
       <div className="tienda-seccion">
+        <button onClick={() => setMostrarCarrito(true)}>
+          🛒​Ver carrito ({carrito.length})
+        </button>
         <h2 className="tienda-seccion-titulo">Recompensas disponibles</h2>
         <div className="tienda-grid">
           {productos.map((producto) => (
@@ -76,11 +93,38 @@ function Tienda() {
               bucles={producto.bucles}
               bgColor={producto.bgColor}
               ecoTag={producto.ecoTag}
-              onCanjear={() => alert(`¡Canjeaste: ${producto.title}!`)}
+              onCanjear={() => {
+                agregarAlCarrito(producto);
+                alert(`¡Canjeaste: ${producto.title}!`);
+              }}
             />
           ))}
         </div>
       </div>
+      {mostrarCarrito && (
+        <div className="modal">
+          <div className="modal-contenido">
+            <h3>Carrito</h3>
+
+            {carrito.map((item) => (
+              <div key={item.id} className="carrito.item">
+                <span>
+                  {item.title} - {item.bucles} bucles
+                </span>
+                <button onClick={() => eliminarDelCarrito(item.id)}>
+                  ​​​❌​
+                </button>
+              </div>
+            ))}
+
+            <p>Total:{total} bucles</p>
+
+            <button onClick={() => setMostrarCarrito(false)}>
+              Cerrar carrito
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
