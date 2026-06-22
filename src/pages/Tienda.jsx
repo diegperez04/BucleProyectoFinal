@@ -1,5 +1,5 @@
 import Card from "../components/ui/Card";
-import Cart from "../components/ui/Cart";
+
 import Tierra from "../assets/Tierra.png";
 import "./Tienda.css";
 import { useState } from "react";
@@ -43,11 +43,6 @@ function Tienda() {
       bgColor: "mix",
     },
   ];
-
-  return (
-    <div className="tienda-page">
-      <Cart />
-
 
   const [carrito, setCarrito] = useState([]);
   const [mostrarCarrito, setMostrarCarrito] = useState(false);
@@ -152,7 +147,6 @@ function Tienda() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
