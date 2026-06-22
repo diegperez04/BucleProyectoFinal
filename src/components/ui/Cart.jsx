@@ -1,10 +1,27 @@
-import Card from "../components/ui/Card";
-import Cart from "../components/ui/Cart";
-import Tierra from "../assets/Tierra.png";
-import "./Tienda.css";
-import { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import Card from "./Card";
+import Tierra from "../../assets/Tierra.png";
 
-function Tienda() {
+function Cart() {
+  const [carrito, setCarrito] = useState([]);
+  const [mostrarCarrito, setMostrarCarrito] = useState(false);
+  const [bucles, setBucles] = useState(1000);
+  const instanceId = React.useRef(Math.random().toString(36).slice(2, 9));
+
+  useEffect(() => {
+    console.log(`Cart mounted id=${instanceId.current}`);
+    window.__cart_instances = window.__cart_instances || {};
+    window.__cart_instances[instanceId.current] = {
+      mounted: true,
+      len: carrito.length,
+    };
+    return () => {
+      console.log(`Cart unmounted id=${instanceId.current}`);
+      if (window.__cart_instances)
+        delete window.__cart_instances[instanceId.current];
+    };
+  }, []);
+
   const productos = [
     {
       id: "1",
@@ -44,23 +61,81 @@ function Tienda() {
     },
   ];
 
-  return (
-    <div className="tienda-page">
-      <Cart />
-
-
-  const [carrito, setCarrito] = useState([]);
-  const [mostrarCarrito, setMostrarCarrito] = useState(false);
-  const [bucles, setBucles] = useState(1000);
-
   const agregarAlCarrito = (producto) => {
-    setCarrito((prev) => [...prev, producto]);
+    console.log(
+      "agregarAlCarrito called",
+      producto,
+      "instance",
+      instanceId.current,
+    );
+    setCarrito((prev) => {
+      console.log(
+        "setCarrito prev length",
+        prev.length,
+        "-> new length",
+        prev.length + 1,
+        "instance",
+        instanceId.current,
+      );
+      return [...prev, producto];
+    });
   };
+
+  useEffect(() => {
+    console.log("carrito state changed", carrito);
+    // Compare rendered button text with state after a render tick
+    setTimeout(() => {
+      try {
+        const btn = document.querySelector(".tienda-seccion > button");
+        if (btn) {
+          console.log(
+            "button text after render:",
+            btn.innerText,
+            "state length:",
+            carrito.length,
+          );
+        } else {
+          console.log("button not found in DOM to compare with state");
+        }
+      } catch (e) {
+        console.log("error reading button text", e);
+      }
+    }, 0);
+    if (
+      window.__cart_instances &&
+      window.__cart_instances[instanceId.current]
+    ) {
+      window.__cart_instances[instanceId.current].len = carrito.length;
+      window.__cart_instances[instanceId.current].updatedAt = Date.now();
+    }
+  }, [carrito]);
+
+  // Open modal when carrito length increases
+  const prevLen = useRef(0);
+  useEffect(() => {
+    if (carrito.length > prevLen.current) {
+      setMostrarCarrito(true);
+    }
+    prevLen.current = carrito.length;
+  }, [carrito]);
 
   const total = carrito.reduce((acc, item) => acc + item.bucles, 0);
 
   const eliminarDelCarrito = (id) => {
-    setCarrito((prev) => prev.filter((item) => item.id !== id));
+    setCarrito((prev) => {
+      const res = prev.filter((item) => item.id !== id);
+      console.log(
+        "eliminarDelCarrito",
+        id,
+        "prevLen",
+        prev.length,
+        "newLen",
+        res.length,
+        "instance",
+        instanceId.current,
+      );
+      return res;
+    });
   };
 
   const realizarCanje = () => {
@@ -69,14 +144,15 @@ function Tienda() {
       return;
     }
 
-    const total = carrito.reduce((acc, item) => acc + item.bucles, 0);
-    if (bucles < total) {
+    const totalCarrito = carrito.reduce((acc, item) => acc + item.bucles, 0);
+    if (bucles < totalCarrito) {
       alert("No tenes suficientes bucles para realizar este canje");
       return;
     }
 
-    setBucles((prev) => prev - total);
+    setBucles((prev) => prev - totalCarrito);
     alert("Canje realizado con exito");
+    console.log("realizarCanje clearing carrito, instance", instanceId.current);
     setCarrito([]);
     setMostrarCarrito(false);
   };
@@ -120,7 +196,6 @@ function Tienda() {
               ecoTag={producto.ecoTag}
               onCanjear={() => {
                 agregarAlCarrito(producto);
-                alert(`¡${producto.title} fue agregado al carrito!`);
               }}
             />
           ))}
@@ -132,7 +207,7 @@ function Tienda() {
             <h3>Carrito</h3>
 
             {carrito.map((item) => (
-              <div key={item.id} className="carrito.item">
+              <div key={item.id} className="carrito-item">
                 <span>
                   {item.title} - {item.bucles} bucles
                 </span>
@@ -142,7 +217,7 @@ function Tienda() {
               </div>
             ))}
 
-            <p>Total:{total} bucles</p>
+            <p>Total: {total} bucles</p>
 
             <button onClick={() => setMostrarCarrito(false)}>
               Cerrar carrito
@@ -152,39 +227,8 @@ function Tienda() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
 
-/*Practicando el uso de tarjetas para ver como quedan
-function Home() {
-  return (
-    <div style={{ padding: "2rem", display: "flex", gap: "1rem" }}>
-      <Card
-        type="producto"
-        emoji="🛒"
-        title="Cupón 20% off en compras"
-        category="Supermercado"
-        bucles={200}
-        bgColor="verde"
-        ecoTag
-        onCanjear={() => console.log("canjeado")}
-      />
-
-
-      <Card
-        type="voluntariado"
-        emoji="🌳"
-        title="Limpieza en Parque Rodó"
-        description="Juntamos residuos y separamos materiales reciclables."
-        date="Sáb 31 mayo · 9:00"
-        bucles={80}
-        onAnotarse={() => console.log("anotado")}
-      />
-    </div>
-  );
-}
-export default Home;
-*/
-export default Tienda;
+export default Cart;
