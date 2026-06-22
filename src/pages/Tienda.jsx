@@ -46,6 +46,7 @@ function Tienda() {
 
   const [carrito, setCarrito] = useState([]);
   const [mostrarCarrito, setMostrarCarrito] = useState(false);
+  const [bucles, setBucles] = useState(1000);
 
   const agregarAlCarrito = (producto) => {
     setCarrito((prev) => [...prev, producto]);
@@ -55,6 +56,24 @@ function Tienda() {
 
   const eliminarDelCarrito = (id) => {
     setCarrito((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const realizarCanje = () => {
+    if (carrito.length === 0) {
+      alert("El carrito está vacío");
+      return;
+    }
+
+    const total = carrito.reduce((acc, item) => acc + item.bucles, 0);
+    if (bucles < total) {
+      alert("No tenes suficientes bucles para realizar este canje");
+      return;
+    }
+
+    setBucles((prev) => prev - total);
+    alert("Canje realizado con exito");
+    setCarrito([]);
+    setMostrarCarrito(false);
   };
 
   return (
@@ -81,6 +100,7 @@ function Tienda() {
         <button onClick={() => setMostrarCarrito(true)}>
           🛒​Ver carrito ({carrito.length})
         </button>
+        <p>{bucles} bucles</p>
         <h2 className="tienda-seccion-titulo">Recompensas disponibles</h2>
         <div className="tienda-grid">
           {productos.map((producto) => (
@@ -95,7 +115,7 @@ function Tienda() {
               ecoTag={producto.ecoTag}
               onCanjear={() => {
                 agregarAlCarrito(producto);
-                alert(`¡Canjeaste: ${producto.title}!`);
+                alert(`¡${producto.title} fue agregado al carrito!`);
               }}
             />
           ))}
@@ -122,6 +142,8 @@ function Tienda() {
             <button onClick={() => setMostrarCarrito(false)}>
               Cerrar carrito
             </button>
+
+            <button onClick={realizarCanje}>Canjear Productos</button>
           </div>
         </div>
       )}
