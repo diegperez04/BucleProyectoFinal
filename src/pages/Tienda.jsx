@@ -59,7 +59,7 @@ function Tienda() {
 
   return (
     <div>
-      //tienda
+      {/* tienda */}
       <div className="tienda">
         <div className="tienda-texto">
           <p className="tienda-eyebrow">Tienda virtual</p>
@@ -76,7 +76,7 @@ function Tienda() {
           <img src={Tierra} alt="Tierra" />
         </div>
       </div>
-      //productos
+      {/* productos */}
       <div className="tienda-seccion">
         <button onClick={() => setMostrarCarrito(true)}>
           🛒​Ver carrito ({carrito.length})
