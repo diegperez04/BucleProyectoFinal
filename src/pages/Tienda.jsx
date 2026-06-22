@@ -79,7 +79,7 @@ function Tienda() {
       {/* productos */}
       <div className="tienda-seccion">
         <button onClick={() => setMostrarCarrito(true)}>
-          🛒​Ver carrito ({carrito.length})
+          🛒 Ver carrito ({carrito.length})
         </button>
         <h2 className="tienda-seccion-titulo">Recompensas disponibles</h2>
         <div className="tienda-grid">
@@ -111,9 +111,7 @@ function Tienda() {
                 <span>
                   {item.title} - {item.bucles} bucles
                 </span>
-                <button onClick={() => eliminarDelCarrito(item.id)}>
-                  ​​​❌​
-                </button>
+                <button onClick={() => eliminarDelCarrito(item.id)}>❌</button>
               </div>
             ))}
 
