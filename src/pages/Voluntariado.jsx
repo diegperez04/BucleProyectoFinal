@@ -8,7 +8,7 @@ import "./Voluntariado.css";
 // ícono personalizado para los pines del mapa
 const iconoVerde = new L.Icon({
   iconUrl:
-    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
+    "https://i.ibb.co/5WF5ND7H/ICON-2.png",
   shadowUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/images/marker-shadow.png",
   iconSize: [25, 41],
