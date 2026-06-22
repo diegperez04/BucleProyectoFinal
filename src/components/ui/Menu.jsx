@@ -5,6 +5,7 @@ function Menu({ seccionActiva, setSeccionActiva }) {
     { id: "volunteering", label: "Voluntariado" },
     { id: "community", label: "Comunidad" },
     { id: "operating", label: "Como Funciona" },
+    {id: "databased", label: "Data"}
   ];
 
   return (

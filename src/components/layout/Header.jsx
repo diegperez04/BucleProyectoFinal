@@ -4,6 +4,7 @@ import Tienda from "../../pages/Tienda";
 import MiPerfil from "../../pages/MiPerfil";
 import Comunidad from "../../pages/Comunidad";
 import ComoFunciona from "../../pages/ComoFunciona";
+import BasadosEnDatos from "../../pages/BasadosEnDatos";
 
 function Header({ seccionActiva = "home" }) {
   const renderContenidoPrincipal = () => {
@@ -18,6 +19,8 @@ function Header({ seccionActiva = "home" }) {
         return <Voluntariado />;
       case "community":
         return <Comunidad />;
+      case "databased":
+        return <BasadosEnDatos />;
       case "profile":
         return <MiPerfil />;
     }
