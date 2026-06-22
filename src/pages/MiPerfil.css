@@ -1,0 +1,111 @@
+.perfil-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f4fff8;
+  padding: 20px;
+}
+
+.formulario-card,
+.perfil-card {
+  width: 100%;
+  max-width: 450px;
+  background: white;
+  padding: 30px;
+  border-radius: 25px;
+  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.selector {
+  display: flex;
+  margin-bottom: 25px;
+}
+
+.selector button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  cursor: pointer;
+  background: #dff7e8;
+}
+
+.selector .activo {
+  background: #8fd3a9;
+  font-weight: bold;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+input {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+form button {
+  background: #8fd3a9;
+}
+
+.perfil-card {
+  text-align: center;
+}
+
+.foto-perfil {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+
+.bucles {
+  margin: 20px auto;
+  background: #dff7e8;
+  padding: 10px;
+  border-radius: 15px;
+  width: fit-content;
+}
+
+.btn-cerrar {
+  background: #ffb4b4;
+}
+.form-canasta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 25px;
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.form-canasta input,
+.form-canasta textarea {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.form-canasta button {
+  background: #8fd3a9;
+  color: white;
+  font-weight: bold;
+}
+
+.foto-canasta {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
