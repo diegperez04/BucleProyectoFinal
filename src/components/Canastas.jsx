@@ -137,6 +137,30 @@ function Canastas() {
                 <img src={canastaSel.imagen} alt={canastaSel.titulo} />
               </div>
 
+              <div className="canasta-mapa-mini">
+                <h3>Ubicación:</h3>
+                <MapContainer
+                  center={[canastaSel.lat, canastaSel.lng]}
+                  zoom={15}
+                  scrollWheelZoom={false}
+                  style={{
+                    height: "280px",
+                    width: "100%",
+                    borderRadius: "12px",
+                  }}
+                >
+                  <TileLayer
+                    attribution="&copy; OpenStreetMap contributors"
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <Marker
+                    position={[canastaSel.lat, canastaSel.lng]}
+                    icon={iconoVerde}
+                  />
+                </MapContainer>
+                <p className="canasta-direccion">📍 {canastaSel.direccion}</p>
+              </div>
+
               <div className="canasta-modal-info">
                 <h2>{canastaSel.titulo}</h2>
                 <p className="canasta-modal-descripcion">
@@ -161,30 +185,6 @@ function Canastas() {
                     />
                     <span>{canastaSel.miembro.nombre}</span>
                   </div>
-                </div>
-
-                <div className="canasta-mapa-mini">
-                  <h3>Ubicación:</h3>
-                  <MapContainer
-                    center={[canastaSel.lat, canastaSel.lng]}
-                    zoom={15}
-                    scrollWheelZoom={false}
-                    style={{
-                      height: "200px",
-                      width: "100%",
-                      borderRadius: "12px",
-                    }}
-                  >
-                    <TileLayer
-                      attribution="&copy; OpenStreetMap contributors"
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <Marker
-                      position={[canastaSel.lat, canastaSel.lng]}
-                      icon={iconoVerde}
-                    />
-                  </MapContainer>
-                  <p className="canasta-direccion">📍 {canastaSel.direccion}</p>
                 </div>
 
                 <button
