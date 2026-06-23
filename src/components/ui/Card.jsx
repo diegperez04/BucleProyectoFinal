@@ -31,7 +31,7 @@ function CardProducto({
           <span className="bucles">{bucles} ●</span>
         </div>
         <button className="btn" onClick={onCanjear}>
-          Canjear
+          Agregar al carrito
         </button>
       </div>
     </div>

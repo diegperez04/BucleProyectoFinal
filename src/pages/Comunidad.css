@@ -1,3 +1,140 @@
+
+:root {
+  --verde: #0d5b47;
+  --marron: #925625;
+  --crema: #faf7f2;
+  --gris: #4a6b5e;
+}
+
+
+.comunidad-hero {
+  background: linear-gradient(135deg, #0d5b47 0%, #1a7a60 60%, #0d4a38 100%);
+  padding: 3.5rem 2.5rem;
+  color: white;
+}
+
+.comunidad-eyebrow {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 0.75rem;
+}
+
+.comunidad-hero h1 {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  max-width: 600px;
+}
+
+.comunidad-hero p {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 540px;
+  line-height: 1.6;
+}
+
+
+.comunidad-seccion {
+  padding: 2.5rem;
+  background: var(--crema);
+}
+
+.comunidad-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.comunidad-card {
+  background: white;
+  border: 1px solid #e0ece7;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+
+.comunidad-card:hover {
+  box-shadow: 0 6px 20px rgba(13, 91, 71, 0.1);
+  transform: translateY(-2px);
+}
+
+.comunidad-img {
+  height: 130px;
+  background: #eaf4ec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  position: relative;
+}
+
+.comunidad-bucles-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--marron);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 10px;
+}
+
+.comunidad-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.comunidad-usuario {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--verde);
+}
+
+.comunidad-descripcion {
+  font-size: 13px;
+  color: #1c2b26;
+  line-height: 1.4;
+}
+
+.comunidad-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--gris);
+  margin-bottom: 6px;
+}
+
+.btn-retirar {
+  width: 100%;
+  padding: 9px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: var(--verde);
+  color: white;
+}
+
+.btn-retirar:hover:not(:disabled) {
+  background: #1a7a60;
+}
+
+.btn-retirar.retirado {
+  background: #eaf4ec;
+  color: var(--verde);
+  cursor: default;
+
 .divprincipal {
   background: linear-gradient(135deg, #0d5b47 0%, #1a7a60 60%, #0d4a38 100%);
   padding: 5rem 2.5rem;
@@ -129,4 +266,5 @@
   .botones-comunidad {
     margin: 0 auto;
   }
+
 }

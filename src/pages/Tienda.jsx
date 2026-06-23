@@ -44,11 +44,6 @@ function Tienda() {
     },
   ];
 
-  return (
-    <div className="tienda-page">
-      <Cart />
-
-
   const [carrito, setCarrito] = useState([]);
   const [mostrarCarrito, setMostrarCarrito] = useState(false);
   const [bucles, setBucles] = useState(1000);
@@ -69,20 +64,22 @@ function Tienda() {
       return;
     }
 
-    const total = carrito.reduce((acc, item) => acc + item.bucles, 0);
-    if (bucles < total) {
+    const totalLocal = carrito.reduce((acc, item) => acc + item.bucles, 0);
+    if (bucles < totalLocal) {
       alert("No tenes suficientes bucles para realizar este canje");
       return;
     }
 
-    setBucles((prev) => prev - total);
+    setBucles((prev) => prev - totalLocal);
     alert("Canje realizado con exito");
     setCarrito([]);
     setMostrarCarrito(false);
   };
 
   return (
-    <div>
+    <div className="tienda-page">
+      <Cart />
+
       {/* tienda */}
       <div className="tienda">
         <div className="tienda-texto">
@@ -103,7 +100,7 @@ function Tienda() {
       {/* productos */}
       <div className="tienda-seccion">
         <button onClick={() => setMostrarCarrito(true)}>
-          🛒​Ver carrito ({carrito.length})
+          🛒 Ver carrito ({carrito.length})
         </button>
         <p>{bucles} bucles</p>
         <h2 className="tienda-seccion-titulo">Recompensas disponibles</h2>
@@ -132,13 +129,11 @@ function Tienda() {
             <h3>Carrito</h3>
 
             {carrito.map((item) => (
-              <div key={item.id} className="carrito.item">
+              <div key={item.id} className="carrito-item">
                 <span>
                   {item.title} - {item.bucles} bucles
                 </span>
-                <button onClick={() => eliminarDelCarrito(item.id)}>
-                  ​​​❌​
-                </button>
+                <button onClick={() => eliminarDelCarrito(item.id)}>❌</button>
               </div>
             ))}
 
@@ -152,39 +147,8 @@ function Tienda() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
 
-/*Practicando el uso de tarjetas para ver como quedan
-function Home() {
-  return (
-    <div style={{ padding: "2rem", display: "flex", gap: "1rem" }}>
-      <Card
-        type="producto"
-        emoji="🛒"
-        title="Cupón 20% off en compras"
-        category="Supermercado"
-        bucles={200}
-        bgColor="verde"
-        ecoTag
-        onCanjear={() => console.log("canjeado")}
-      />
-
-
-      <Card
-        type="voluntariado"
-        emoji="🌳"
-        title="Limpieza en Parque Rodó"
-        description="Juntamos residuos y separamos materiales reciclables."
-        date="Sáb 31 mayo · 9:00"
-        bucles={80}
-        onAnotarse={() => console.log("anotado")}
-      />
-    </div>
-  );
-}
-export default Home;
-*/
 export default Tienda;

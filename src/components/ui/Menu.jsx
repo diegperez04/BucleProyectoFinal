@@ -1,12 +1,14 @@
+import { useAuth } from "../../controlers/AuthContext";
+
 function Menu({ seccionActiva, setSeccionActiva }) {
+  const { usuario } = useAuth();
+
   const menuItems = [
     { id: "home", label: "Inicio" },
     { id: "store", label: "Tienda" },
     { id: "volunteering", label: "Voluntariado" },
     { id: "community", label: "Comunidad" },
-    { id: "profile", label: "Mi Perfil" },
     { id: "operating", label: "Como Funciona" },
-    {id: "databased", label: "Data"}
   ];
 
   return (
@@ -21,6 +23,15 @@ function Menu({ seccionActiva, setSeccionActiva }) {
           </button>
         </li>
       ))}
+
+      <li>
+        <button
+          onClick={() => setSeccionActiva(usuario ? "profile" : "login")}
+          className={`BotonMenu ${seccionActiva === "profile" || seccionActiva === "login" ? "active" : ""}`}
+        >
+          {usuario ? `Hola, ${usuario.nombre}` : "Ingresar"}
+        </button>
+      </li>
     </ul>
   );
 }

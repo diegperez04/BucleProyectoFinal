@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Card from "./Card";
 import Tierra from "../../assets/Tierra.png";
 
@@ -6,19 +6,21 @@ function Cart() {
   const [carrito, setCarrito] = useState([]);
   const [mostrarCarrito, setMostrarCarrito] = useState(false);
   const [bucles, setBucles] = useState(1000);
-  const instanceId = React.useRef(Math.random().toString(36).slice(2, 9));
+  const instanceId = useRef(null);
 
   useEffect(() => {
-    console.log(`Cart mounted id=${instanceId.current}`);
+    instanceId.current = Math.random().toString(36).slice(2, 9);
+    const id = instanceId.current;
+    console.log(`Cart mounted id=${id}`);
     window.__cart_instances = window.__cart_instances || {};
-    window.__cart_instances[instanceId.current] = {
+    // initial length is 0 on mount
+    window.__cart_instances[id] = {
       mounted: true,
-      len: carrito.length,
+      len: 0,
     };
     return () => {
-      console.log(`Cart unmounted id=${instanceId.current}`);
-      if (window.__cart_instances)
-        delete window.__cart_instances[instanceId.current];
+      console.log(`Cart unmounted id=${id}`);
+      if (window.__cart_instances) delete window.__cart_instances[id];
     };
   }, []);
 
@@ -83,7 +85,7 @@ function Cart() {
 
   useEffect(() => {
     console.log("carrito state changed", carrito);
-    // Compare rendered button text with state after a render tick
+
     setTimeout(() => {
       try {
         const btn = document.querySelector(".tienda-seccion > button");
@@ -110,7 +112,6 @@ function Cart() {
     }
   }, [carrito]);
 
-  // Open modal when carrito length increases
   const prevLen = useRef(0);
   useEffect(() => {
     if (carrito.length > prevLen.current) {
@@ -179,7 +180,7 @@ function Cart() {
       {/* productos */}
       <div className="tienda-seccion">
         <button onClick={() => setMostrarCarrito(true)}>
-          🛒​Ver carrito ({carrito.length})
+          🛒 Ver carrito ({carrito.length})
         </button>
         <p>{bucles} bucles</p>
         <h2 className="tienda-seccion-titulo">Recompensas disponibles</h2>
@@ -211,9 +212,7 @@ function Cart() {
                 <span>
                   {item.title} - {item.bucles} bucles
                 </span>
-                <button onClick={() => eliminarDelCarrito(item.id)}>
-                  ​​​❌​
-                </button>
+                <button onClick={() => eliminarDelCarrito(item.id)}>❌</button>
               </div>
             ))}
 
