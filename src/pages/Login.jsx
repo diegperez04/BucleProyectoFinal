@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../controlers/AuthContext";
+import { useAuth } from "../context/useAuth";
 import "./Login.css";
 import logoBucle from "../assets/BUCLE03-02.jpg";
 function Login({ onIngreso }) {
@@ -38,7 +38,7 @@ function Login({ onIngreso }) {
       <div className="login-card">
         <div className="login-logo">
           <img src={logoBucle} alt="Bucle" className="login-logo-img" />
-          <span className="login-brand">bucle</span>
+          <span className="login-brand"></span>
         </div>
 
         <div className="login-tabs">

@@ -1,55 +1,81 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/useAuth";
 import "./Comunidad.css";
 
-//aca los datos vienen del backend, estos no van a quedar, tenems que hacer este metodo, GET ${API_URL}/canastas?estado=Disponible
-const canastasComunidad = [
-  {
-    id: 1,
-    usuario: "María Fernández",
-    foto: "🧃",
-    descripcion: "Botellas de plástico y envases limpios",
-    ubicacion: "Cordón, Montevideo",
-    cantidad: "5 kg aprox.",
-    bucles: 25,
-  },
-  {
-    id: 2,
-    usuario: "Joaquín Pérez",
-    foto: "📦",
-    descripcion: "Cajas de cartón y diarios viejos",
-    ubicacion: "Pocitos, Montevideo",
-    cantidad: "3 kg aprox.",
-    bucles: 15,
-  },
-  {
-    id: 3,
-    usuario: "Lucía Gómez",
-    foto: "🍾",
-    descripcion: "Frascos y botellas de vidrio",
-    ubicacion: "Parque Batlle, Montevideo",
-    cantidad: "8 kg aprox.",
-    bucles: 35,
-  },
-  {
-    id: 4,
-    usuario: "Andrés Silva",
-    foto: "👕",
-    descripcion: "Ropa en buen estado para reutilizar",
-    ubicacion: "Malvín, Montevideo",
-    cantidad: "2 bolsas grandes",
-    bucles: 20,
-  },
-];
+const API_URL = "http://localhost:3000/api";
 
 function Comunidad() {
-  const [retiradas, setRetiradas] = useState([]);
+  const { usuario, setUsuario } = useAuth();
+  const token = localStorage.getItem("bucle_token");
 
-  const handleRetirar = (id) => {
-    if (retiradas.includes(id)) return;
-    setRetiradas([...retiradas, id]);
+  const [canastas, setCanastas] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [retirando, setRetirando] = useState(null); // id de la canasta en proceso
+  const [errorGeneral, setErrorGeneral] = useState("");
 
-    //cuando tengamos backend tenemos que hacer esto, fetch(`${API_URL}/canastas/${id}/retirar`, { method: "PATCH" });
+  const cargarCanastas = async () => {
+    setCargando(true);
+    try {
+      const res = await fetch(`${API_URL}/canastas?estado=Disponible`);
+      const data = await res.json();
+      setCanastas(data);
+    } catch (err) {
+      console.error(err);
+      setErrorGeneral(
+        "No pudimos cargar las canastas. ¿Está corriendo el servidor?",
+      );
+    } finally {
+      setCargando(false);
+    }
   };
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      cargarCanastas();
+    }, 0);
+    return () => clearTimeout(t);
+  }, []);
+
+  const handleRetirar = async (id) => {
+    if (!usuario) {
+      setErrorGeneral("Tenés que iniciar sesión para retirar una canasta.");
+      return;
+    }
+
+    setRetirando(id);
+    try {
+      const res = await fetch(`${API_URL}/canastas/${id}/retirar`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setErrorGeneral(data.error || "No se pudo retirar la canasta.");
+        return;
+      }
+
+      const actualizada = await res.json();
+      setCanastas(canastas.map((c) => (c.id === id ? actualizada : c)));
+
+      // refrescamos los bucles del usuario, ya que retirar suma bucles
+      const resUsuario = await fetch(`${API_URL}/usuarios/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (resUsuario.ok) {
+        const datosUsuario = await resUsuario.json();
+        setUsuario((prev) => ({ ...prev, ...datosUsuario }));
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorGeneral("Error de conexión al retirar la canasta.");
+    } finally {
+      setRetirando(null);
+    }
+  };
+
+  // solo se ven las que siguen disponibles (las recién retiradas se filtran)
+  const canastasVisibles = canastas.filter((c) => c.estado === "Disponible");
 
   return (
     <div>
@@ -62,37 +88,47 @@ function Comunidad() {
         </p>
       </div>
 
-      {/*canastas */}
+      {errorGeneral && (
+        <div className="vol-error-banner" style={{ margin: "1rem 2.5rem 0" }}>
+          {errorGeneral}
+          <button onClick={() => setErrorGeneral("")}>✕</button>
+        </div>
+      )}
+
+      {/* Grid de canastas */}
       <div className="comunidad-seccion">
+        {cargando && <p className="vol-cargando">Cargando canastas...</p>}
+
+        {!cargando && canastasVisibles.length === 0 && (
+          <p className="vol-cargando">No hay canastas disponibles por ahora.</p>
+        )}
+
         <div className="comunidad-grid">
-          {canastasComunidad.map((c) => {
-            const retirada = retiradas.includes(c.id);
-            return (
-              <div key={c.id} className="comunidad-card">
-                <div className="comunidad-img">
-                  <span>{c.foto}</span>
-                  <span className="comunidad-bucles-tag">
-                    +{c.bucles} bucles
-                  </span>
-                </div>
-                <div className="comunidad-body">
-                  <p className="comunidad-usuario">👤 {c.usuario}</p>
-                  <p className="comunidad-descripcion">{c.descripcion}</p>
-                  <div className="comunidad-meta">
-                    <span>📍 {c.ubicacion}</span>
-                    <span>{c.cantidad}</span>
-                  </div>
-                  <button
-                    className={`btn-retirar ${retirada ? "retirado" : ""}`}
-                    onClick={() => handleRetirar(c.id)}
-                    disabled={retirada}
-                  >
-                    {retirada ? "✓ Vas a retirarla" : "Quiero retirarla"}
-                  </button>
-                </div>
+          {canastasVisibles.map((c) => (
+            <div key={c.id} className="comunidad-card">
+              <div className="comunidad-img">
+                <span>{c.foto || "🗑️"}</span>
+                <span className="comunidad-bucles-tag">+{c.bucles} bucles</span>
               </div>
-            );
-          })}
+              <div className="comunidad-body">
+                <p className="comunidad-usuario">
+                  👤 {c.usuario?.nombre || "Usuario"}
+                </p>
+                <p className="comunidad-descripcion">{c.descripcion}</p>
+                <div className="comunidad-meta">
+                  <span>📍 {c.ubicacion}</span>
+                  <span>{c.cantidad}</span>
+                </div>
+                <button
+                  className="btn-retirar"
+                  onClick={() => handleRetirar(c.id)}
+                  disabled={retirando === c.id}
+                >
+                  {retirando === c.id ? "Retirando..." : "Quiero retirarla"}
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

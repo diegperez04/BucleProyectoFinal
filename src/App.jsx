@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AuthProvider } from "./controlers/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Header from "./components/layout/Header";

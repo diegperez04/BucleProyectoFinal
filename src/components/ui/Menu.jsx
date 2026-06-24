@@ -1,4 +1,4 @@
-import { useAuth } from "../../controlers/AuthContext";
+import { useAuth } from "../../context/useAuth";
 
 function Menu({ seccionActiva, setSeccionActiva }) {
   const { usuario } = useAuth();
