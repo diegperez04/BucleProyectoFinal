@@ -1,118 +1,212 @@
-import { useState } from "react";
-import { useAuth } from "../controlers/AuthContext";
-
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/useAuth";
 import "./MiPerfil.css";
 
-// esto lo cambiamos cuando tengamos el json
-const historialEjemplo = [
-  {
-    id: 1,
-    title: "Limpieza en Parque Rodó",
-    date: "2026-04-12",
-    bucles: 80,
-    estado: "Completado",
-  },
-  {
-    id: 2,
-    title: "Punto verde en La Feria",
-    date: "2026-04-28",
-    bucles: 60,
-    estado: "Completado",
-  },
-  {
-    id: 3,
-    title: "Taller de reciclaje escolar",
-    date: "2026-06-05",
-    bucles: 100,
-    estado: "Anotado",
-  },
-];
+const API_URL = "http://localhost:3000/api";
 
-const canastasEjemplo = [
-  {
-    id: 1,
-    foto: "🧃",
-    descripcion: "Botellas de plástico y envases limpios",
-    ubicacion: "Cordón, Montevideo",
-    cantidad: "5 kg aprox.",
-    estado: "Disponible",
-  },
-  {
-    id: 2,
-    foto: "📦",
-    descripcion: "Cajas de cartón y diarios viejos",
-    ubicacion: "Cordón, Montevideo",
-    cantidad: "3 kg aprox.",
-    estado: "Retirada",
-  },
-];
-function MiPerfil() {
-  const { usuario, logout } = useAuth();
+function formatearFecha(fecha) {
+  return new Date(fecha).toLocaleDateString("es-UY", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+export default function MiPerfil({ onNecesitaLogin }) {
+  const { usuario, setUsuario, logout } = useAuth();
+  const token = localStorage.getItem("bucle_token");
+
   const [tab, setTab] = useState("datos");
+
+  const [historial, setHistorial] = useState([]);
+  const [cargandoHistorial, setCargandoHistorial] = useState(true);
+
+  const [canastas, setCanastas] = useState([]);
+  const [cargandoCanastas, setCargandoCanastas] = useState(true);
+
   const [modalCanastaAbierto, setModalCanastaAbierto] = useState(false);
-  const [canastas, setCanastas] = useState(canastasEjemplo);
+  const [creandoCanasta, setCreandoCanasta] = useState(false);
+  const [errorCanasta, setErrorCanasta] = useState("");
+
+  const [selectorAvatarAbierto, setSelectorAvatarAbierto] = useState(false);
+  const opcionesAvatar = [
+    "🙂",
+    "🌱",
+    "🌳",
+    "♻️",
+    "🌍",
+    "🐢",
+    "🦊",
+    "🐸",
+    "🌻",
+    "🍃",
+  ];
 
   const [form, setForm] = useState({
     descripcion: "",
     ubicacion: "",
     cantidad: "",
-    foto: null,
-    fotoPreview: null,
+    emoji: "🗑️",
   });
 
-  const totalBucles = historialEjemplo
-    .filter((h) => h.estado === "Completado")
-    .reduce((acc, h) => acc + h.bucles, 0);
+  // ─── Cargar datos del usuario, historial y canastas al entrar ──
+  useEffect(() => {
+    if (!usuario) return;
+    refrescarUsuario();
+    cargarHistorial();
+    cargarMisCanastas();
+  }, []);
 
-  const handleFoto = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setForm({ ...form, foto: file, fotoPreview: URL.createObjectURL(file) });
+  const refrescarUsuario = async () => {
+    try {
+      const res = await fetch(`${API_URL}/usuarios/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      // actualizamos el usuario en el contexto global con el bucles al día
+      setUsuario((prev) => ({ ...prev, ...data }));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleCrearCanasta = () => {
+  const cargarHistorial = async () => {
+    setCargandoHistorial(true);
+    try {
+      const res = await fetch(`${API_URL}/voluntariados/mis-anotaciones`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setHistorial(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCargandoHistorial(false);
+    }
+  };
+
+  const cargarMisCanastas = async () => {
+    setCargandoCanastas(true);
+    try {
+      const res = await fetch(`${API_URL}/canastas?usuarioId=${usuario.id}`);
+      const data = await res.json();
+      setCanastas(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCargandoCanastas(false);
+    }
+  };
+
+  const handleCambiarAvatar = async (emoji) => {
+    setSelectorAvatarAbierto(false);
+    try {
+      const res = await fetch(`${API_URL}/usuarios/me/avatar`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ avatar: emoji }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setUsuario((prev) => ({ ...prev, ...data }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCrearCanasta = async () => {
     if (!form.descripcion || !form.ubicacion || !form.cantidad) return;
 
-    const nueva = {
-      id: Date.now(),
-      foto: form.fotoPreview || "🗑️",
-      descripcion: form.descripcion,
-      ubicacion: form.ubicacion,
-      cantidad: form.cantidad,
-      estado: "Disponible",
-    };
+    setErrorCanasta("");
+    setCreandoCanasta(true);
+    try {
+      const res = await fetch(`${API_URL}/canastas`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          foto: form.emoji,
+          descripcion: form.descripcion,
+          ubicacion: form.ubicacion,
+          cantidad: form.cantidad,
+        }),
+      });
 
-    setCanastas([nueva, ...canastas]);
-    setForm({
-      descripcion: "",
-      ubicacion: "",
-      cantidad: "",
-      foto: null,
-      fotoPreview: null,
-    });
-    setModalCanastaAbierto(false);
+      if (!res.ok) {
+        const data = await res.json();
+        setErrorCanasta(data.error || "No se pudo crear la canasta.");
+        return;
+      }
 
-    // Cambiar para le back
-    // const formData = new FormData();
-    // formData.append("descripcion", form.descripcion);
-    // formData.append("ubicacion", form.ubicacion);
-    // formData.append("cantidad", form.cantidad);
-    // formData.append("foto", form.foto);
-    // fetch(`${API_URL}/canastas`, { method: "POST", body: formData });
+      const nueva = await res.json();
+      setCanastas([nueva, ...canastas]);
+      setForm({ descripcion: "", ubicacion: "", cantidad: "", emoji: "🗑️" });
+      setModalCanastaAbierto(false);
+    } catch (err) {
+      console.error(err);
+      setErrorCanasta("Error de conexión al crear la canasta.");
+    } finally {
+      setCreandoCanasta(false);
+    }
   };
+
+  if (!usuario) {
+    return (
+      <div className="perfil-wrapper">
+        <div style={{ padding: "2rem", textAlign: "center" }}>
+          <p style={{ marginBottom: "1rem" }}>
+            Necesitás iniciar sesión para ver tu perfil.
+          </p>
+          <button className="btn-nuevo" onClick={onNecesitaLogin}>
+            Ir a iniciar sesión
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const buclesActuales = usuario.bucles || 0;
+  const completados = historial.filter((h) => h.estado === "Completado").length;
 
   return (
     <div className="perfil-wrapper">
+      {/* Header del perfil */}
       <div className="perfil-header">
-        <div className="perfil-avatar">
-          {usuario?.nombre?.[0]?.toUpperCase() || "U"}
+        <div className="perfil-avatar-wrapper">
+          <button
+            className="perfil-avatar perfil-avatar-btn"
+            onClick={() => setSelectorAvatarAbierto(!selectorAvatarAbierto)}
+            title="Cambiar foto de perfil"
+          >
+            {usuario?.avatar || "🙂"}
+          </button>
+
+          {selectorAvatarAbierto && (
+            <div className="avatar-selector">
+              {opcionesAvatar.map((emoji) => (
+                <button
+                  key={emoji}
+                  className="avatar-opcion"
+                  onClick={() => handleCambiarAvatar(emoji)}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className="perfil-info">
-          <h1>{usuario?.nombre || "Usuario"}</h1>
-          <p>{usuario?.email || "usuario@email.com"}</p>
+          <h1>{usuario?.nombre}</h1>
+          <p>{usuario?.email}</p>
         </div>
         <div className="perfil-bucles">
-          <span className="perfil-bucles-num">{totalBucles}</span>
+          <span className="perfil-bucles-num">{buclesActuales}</span>
           <span className="perfil-bucles-label">bucles acumulados</span>
         </div>
         <button className="perfil-logout" onClick={logout}>
@@ -120,6 +214,7 @@ function MiPerfil() {
         </button>
       </div>
 
+      {/* Tabs */}
       <div className="perfil-tabs">
         <button
           className={tab === "datos" ? "perfil-tab activo" : "perfil-tab"}
@@ -143,48 +238,47 @@ function MiPerfil() {
         </button>
       </div>
 
+      {/* Contenido según tab */}
       <div className="perfil-contenido">
         {tab === "datos" && (
           <div className="perfil-datos">
             <div className="dato-fila">
               <span className="dato-label">Nombre</span>
-              <span className="dato-valor">{usuario?.nombre || "—"}</span>
+              <span className="dato-valor">{usuario?.nombre}</span>
             </div>
             <div className="dato-fila">
               <span className="dato-label">Email</span>
-              <span className="dato-valor">{usuario?.email || "—"}</span>
+              <span className="dato-valor">{usuario?.email}</span>
             </div>
             <div className="dato-fila">
               <span className="dato-label">Bucles totales</span>
-              <span className="dato-valor">{totalBucles}</span>
+              <span className="dato-valor">{buclesActuales}</span>
             </div>
             <div className="dato-fila">
               <span className="dato-label">Voluntariados completados</span>
-              <span className="dato-valor">
-                {
-                  historialEjemplo.filter((h) => h.estado === "Completado")
-                    .length
-                }
-              </span>
+              <span className="dato-valor">{completados}</span>
             </div>
           </div>
         )}
 
         {tab === "voluntariados" && (
           <div className="historial-lista">
-            {historialEjemplo.map((h) => (
+            {cargandoHistorial && (
+              <p className="vol-cargando">Cargando historial...</p>
+            )}
+
+            {!cargandoHistorial && historial.length === 0 && (
+              <p className="vol-cargando">
+                Todavía no te anotaste a ningún voluntariado.
+              </p>
+            )}
+
+            {historial.map((h) => (
               <div key={h.id} className="historial-item">
                 <div className="historial-info">
-                  <h4>{h.title}</h4>
+                  <h4>{h.voluntariado?.titulo}</h4>
                   <span className="historial-fecha">
-                    {new Date(h.date + "T00:00:00").toLocaleDateString(
-                      "es-UY",
-                      {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      },
-                    )}
+                    {formatearFecha(h.voluntariado?.fecha)}
                   </span>
                 </div>
                 <span
@@ -192,7 +286,9 @@ function MiPerfil() {
                 >
                   {h.estado}
                 </span>
-                <span className="historial-bucles">+{h.bucles} bucles</span>
+                <span className="historial-bucles">
+                  +{h.voluntariado?.bucles} bucles
+                </span>
               </div>
             ))}
           </div>
@@ -210,16 +306,21 @@ function MiPerfil() {
               </button>
             </div>
 
+            {cargandoCanastas && (
+              <p className="vol-cargando">Cargando canastas...</p>
+            )}
+
+            {!cargandoCanastas && canastas.length === 0 && (
+              <p className="vol-cargando">
+                Todavía no creaste ninguna canasta.
+              </p>
+            )}
+
             <div className="canastas-grid">
               {canastas.map((c) => (
                 <div key={c.id} className="canasta-card">
                   <div className="canasta-img">
-                    {c.foto.startsWith?.("blob:") ||
-                    c.foto.startsWith?.("http") ? (
-                      <img src={c.foto} alt="Canasta" />
-                    ) : (
-                      <span>{c.foto}</span>
-                    )}
+                    <span>{c.foto || "🗑️"}</span>
                     <span
                       className={`canasta-estado ${c.estado === "Disponible" ? "disponible" : "retirada"}`}
                     >
@@ -238,6 +339,7 @@ function MiPerfil() {
         )}
       </div>
 
+      {/* Modal crear canasta */}
       {modalCanastaAbierto && (
         <div
           className="perfil-modal-overlay"
@@ -256,24 +358,19 @@ function MiPerfil() {
 
             <div className="perfil-form">
               <div className="perfil-form-grupo">
-                <label>Foto</label>
-                <label className="foto-upload">
-                  {form.fotoPreview ? (
-                    <img
-                      src={form.fotoPreview}
-                      alt="Preview"
-                      className="foto-preview"
-                    />
-                  ) : (
-                    <span className="foto-placeholder">📷 Subir foto</span>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFoto}
-                    hidden
-                  />
-                </label>
+                <label>Ícono</label>
+                <select
+                  value={form.emoji}
+                  onChange={(e) => setForm({ ...form, emoji: e.target.value })}
+                  style={{ width: "100px" }}
+                >
+                  <option>🗑️</option>
+                  <option>🧃</option>
+                  <option>📦</option>
+                  <option>🍶</option>
+                  <option>👕</option>
+                  <option>🔋</option>
+                </select>
               </div>
 
               <div className="perfil-form-grupo">
@@ -311,6 +408,8 @@ function MiPerfil() {
                   />
                 </div>
               </div>
+
+              {errorCanasta && <p className="vol-form-error">{errorCanasta}</p>}
             </div>
 
             <div className="perfil-modal-actions">
@@ -324,10 +423,13 @@ function MiPerfil() {
                 className="perfil-btn-confirmar"
                 onClick={handleCrearCanasta}
                 disabled={
-                  !form.descripcion || !form.ubicacion || !form.cantidad
+                  !form.descripcion ||
+                  !form.ubicacion ||
+                  !form.cantidad ||
+                  creandoCanasta
                 }
               >
-                Publicar canasta
+                {creandoCanasta ? "Publicando..." : "Publicar canasta"}
               </button>
             </div>
           </div>
@@ -336,4 +438,3 @@ function MiPerfil() {
     </div>
   );
 }
-export default MiPerfil;

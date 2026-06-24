@@ -5,7 +5,6 @@
   --gris: #4a6b5e;
 }
 
-/* ─── Hero ────────────────────────────────────────── */
 .vol-hero {
   background: linear-gradient(135deg, #0d5b47 0%, #1a7a60 60%, #0d4a38 100%);
   padding: 3.5rem 2.5rem;
@@ -54,7 +53,7 @@
   background: #eaf4ec;
 }
 
-/* ─── Sección lista ───────────────────────────────── */
+/* listas */
 .vol-seccion {
   padding: 3rem 2.5rem;
   background: var(--crema);
@@ -67,7 +66,32 @@
   margin-bottom: 1.5rem;
 }
 
-/* ─── Mapa ────────────────────────────────────────── */
+.vol-error-banner {
+  background: #fbeaea;
+  color: #c0392b;
+  padding: 12px 20px;
+  margin: 0 2.5rem 0;
+  border-radius: 10px;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vol-error-banner button {
+  background: none;
+  border: none;
+  color: #c0392b;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.vol-cargando {
+  font-size: 14px;
+  color: var(--gris);
+  padding: 1rem 0;
+}
+
 .vol-mapa-seccion {
   padding-bottom: 1rem;
 }
@@ -78,7 +102,7 @@
   border: 1px solid #e0ece7;
 }
 
-/* ─── Evento ──────────────────────────────────────── */
+/*Evento*/
 .vol-lista {
   display: flex;
   flex-direction: column;
@@ -234,7 +258,7 @@
   cursor: default;
 }
 
-/* ─── Modal ───────────────────────────────────────── */
+/*Modal*/
 .vol-modal-overlay {
   position: fixed;
   inset: 0;
@@ -286,7 +310,7 @@
   background: #f0f0f0;
 }
 
-/* ─── Formulario ──────────────────────────────────── */
+/*Formulario*/
 .vol-form {
   display: flex;
   flex-direction: column;
@@ -336,7 +360,6 @@
   min-height: 80px;
 }
 
-/* ─── Botones del modal ───────────────────────────── */
 .vol-modal-actions {
   display: flex;
   gap: 10px;

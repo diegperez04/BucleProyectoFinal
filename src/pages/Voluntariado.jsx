@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-
+import { useAuth } from "../context/useAuth";
 import "./Voluntariado.css";
 
+const API_URL = "http://localhost:3000/api";
 // ícono personalizado para los pines del mapa
 const iconoVerde = new L.Icon({
-  iconUrl:
-    "https://i.ibb.co/5WF5ND7H/ICON-2.png",
+  iconUrl: "https://i.ibb.co/5WF5ND7H/ICON-2.png",
   shadowUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/images/marker-shadow.png",
   iconSize: [25, 41],
@@ -17,69 +17,26 @@ const iconoVerde = new L.Icon({
   shadowSize: [41, 41],
 });
 
-const eventosIniciales = [
-  {
-    id: 1,
-    emoji: "🌳",
-    title: "Limpieza en Parque Rodó",
-    description:
-      "Juntamos residuos y separamos materiales reciclables. Materiales provistos. Apto para toda la familia.",
-    date: "2026-05-31",
-    hora: "9:00",
-    bucles: 80,
-    anotados: 12,
-    direccion: "Parque Rodó, Montevideo",
-    lat: -34.9135,
-    lng: -56.1577,
-    fijo: true,
-  },
-  {
-    id: 2,
-    emoji: "♻️",
-    title: "Punto verde en La Feria",
-    description:
-      "Ayudamos a los feriantes a separar sus residuos correctamente y educamos a los visitantes.",
-    date: "2026-06-01",
-    hora: "10:00",
-    bucles: 60,
-    anotados: 8,
-    direccion: "Tristán Narvaja, Montevideo",
-    lat: -34.9011,
-    lng: -56.1645,
-    fijo: true,
-  },
-  {
-    id: 3,
-    emoji: "🏫",
-    title: "Taller de reciclaje escolar",
-    description:
-      "Damos talleres de educación ambiental en escuelas primarias de Montevideo.",
-    date: "2026-06-05",
-    hora: "14:00",
-    bucles: 100,
-    anotados: 5,
-    direccion: "Cordón, Montevideo",
-    lat: -34.8941,
-    lng: -56.1675,
-    fijo: true,
-  },
-];
-
 function formatearFecha(fecha) {
   const opciones = { weekday: "short", day: "numeric", month: "long" };
-  return new Date(fecha + "T00:00:00").toLocaleDateString("es-UY", opciones);
+  return new Date(fecha).toLocaleDateString("es-UY", opciones);
 }
 function Voluntariado() {
-  const [eventos, setEventos] = useState(eventosIniciales);
+  const { usuario } = useAuth();
+  const token = localStorage.getItem("bucle_token");
+
+  const [eventos, setEventos] = useState([]);
+  const [cargando, setCargando] = useState(true);
   const [anotadoEn, setAnotadoEn] = useState([]);
   const [modalAbierto, setModalAbierto] = useState(false);
+  const [errorGeneral, setErrorGeneral] = useState("");
 
   // estado del formulario
   const [form, setForm] = useState({
     emoji: "🌱",
-    title: "",
-    description: "",
-    date: "",
+    titulo: "",
+    descripcion: "",
+    fecha: "",
     hora: "",
     bucles: "",
     direccion: "",
@@ -87,18 +44,69 @@ function Voluntariado() {
 
   const [buscandoDireccion, setBuscandoDireccion] = useState(false);
   const [errorDireccion, setErrorDireccion] = useState("");
+  const [creando, setCreando] = useState(false);
 
-  const handleAnotarse = (id) => {
-    if (anotadoEn.includes(id)) return;
-    setAnotadoEn([...anotadoEn, id]);
-    setEventos(
-      eventos.map((e) =>
-        e.id === id ? { ...e, anotados: e.anotados + 1 } : e,
-      ),
-    );
+  const cargarEventos = async () => {
+    setCargando(true);
+    try {
+      const res = await fetch(`${API_URL}/voluntariados`);
+      const data = await res.json();
+      setEventos(data);
+    } catch (err) {
+      console.error(err);
+      setErrorGeneral(
+        "No pudimos cargar los voluntariados. ¿Está corriendo el servidor?",
+      );
+    } finally {
+      setCargando(false);
+    }
   };
 
-  // busca coordenadas a partir de una dirección usando Nominatim (OpenStreetMap, gratis)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      cargarEventos();
+    }, 0);
+    return () => clearTimeout(t);
+  }, []);
+
+  const handleAnotarse = async (id) => {
+    if (!usuario) {
+      setErrorGeneral(
+        "Tenés que iniciar sesión para anotarte a un voluntariado.",
+      );
+      return;
+    }
+    if (anotadoEn.includes(id)) return;
+
+    try {
+      const res = await fetch(`${API_URL}/voluntariados/${id}/anotarse`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setErrorGeneral(data.error || "No se pudo anotar.");
+        return;
+      }
+
+      setAnotadoEn([...anotadoEn, id]);
+      // actualizamos el contador local sin tener que recargar todo
+      setEventos(
+        eventos.map((e) =>
+          e.id === id ? { ...e, anotados: (e.anotados || 0) + 1 } : e,
+        ),
+      );
+    } catch (err) {
+      console.error(err);
+      setErrorGeneral("Error de conexión al anotarse.");
+    }
+  };
+
+  // ─── Geocoding de dirección (Nominatim, gratis) ──────────────
   const buscarCoordenadas = async (direccion) => {
     const query = `${direccion}, Montevideo, Uruguay`;
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`;
@@ -110,13 +118,18 @@ function Voluntariado() {
 
   const handleCrear = async () => {
     if (
-      !form.title ||
-      !form.date ||
+      !form.titulo ||
+      !form.fecha ||
       !form.hora ||
       !form.bucles ||
       !form.direccion
     )
       return;
+
+    if (!usuario) {
+      setErrorDireccion("Tenés que iniciar sesión para crear un evento.");
+      return;
+    }
 
     setErrorDireccion("");
     setBuscandoDireccion(true);
@@ -130,45 +143,80 @@ function Voluntariado() {
       return;
     }
 
-    const nuevo = {
-      id: Date.now(),
-      emoji: form.emoji,
-      title: form.title,
-      description: form.description,
-      date: form.date,
-      hora: form.hora,
-      bucles: Number(form.bucles),
-      anotados: 0,
-      direccion: form.direccion,
-      lat: coords.lat,
-      lng: coords.lng,
-      fijo: false,
-    };
-    // insertar ordenado por fecha
-    const nuevos = [...eventos, nuevo].sort(
-      (a, b) => new Date(a.date) - new Date(b.date),
-    );
-    setEventos(nuevos);
-    setForm({
-      emoji: "🌱",
-      title: "",
-      description: "",
-      date: "",
-      hora: "",
-      bucles: "",
-      direccion: "",
-    });
-    setModalAbierto(false);
+    setCreando(true);
+    try {
+      const res = await fetch(`${API_URL}/voluntariados`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          emoji: form.emoji,
+          titulo: form.titulo,
+          descripcion: form.descripcion,
+          fecha: form.fecha,
+          hora: form.hora,
+          bucles: Number(form.bucles),
+          direccion: form.direccion,
+          lat: coords.lat,
+          lng: coords.lng,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setErrorDireccion(data.error || "No se pudo crear el evento.");
+        return;
+      }
+
+      const nuevo = await res.json();
+      setEventos(
+        [...eventos, { ...nuevo, anotados: 0 }].sort(
+          (a, b) => new Date(a.fecha) - new Date(b.fecha),
+        ),
+      );
+      setForm({
+        emoji: "🌱",
+        titulo: "",
+        descripcion: "",
+        fecha: "",
+        hora: "",
+        bucles: "",
+        direccion: "",
+      });
+      setModalAbierto(false);
+    } catch (err) {
+      console.error(err);
+      setErrorDireccion("Error de conexión al crear el evento.");
+    } finally {
+      setCreando(false);
+    }
   };
 
-  const handleEliminar = (id) => {
-    setEventos(eventos.filter((e) => e.id !== id));
-    setAnotadoEn(anotadoEn.filter((aId) => aId !== id));
+  const handleEliminar = async (id) => {
+    try {
+      const res = await fetch(`${API_URL}/voluntariados/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setErrorGeneral(data.error || "No se pudo eliminar.");
+        return;
+      }
+
+      setEventos(eventos.filter((e) => e.id !== id));
+      setAnotadoEn(anotadoEn.filter((aId) => aId !== id));
+    } catch (err) {
+      console.error(err);
+      setErrorGeneral("Error de conexión al eliminar.");
+    }
   };
 
   return (
     <div>
-      {/* Hero */}
       <div className="vol-hero">
         <div>
           <p className="vol-eyebrow">Voluntariado</p>
@@ -187,7 +235,13 @@ function Voluntariado() {
         </button>
       </div>
 
-      {/* Mapa de Montevideo */}
+      {errorGeneral && (
+        <div className="vol-error-banner">
+          {errorGeneral}
+          <button onClick={() => setErrorGeneral("")}>✕</button>
+        </div>
+      )}
+
       <div className="vol-seccion vol-mapa-seccion">
         <h2 className="vol-seccion-titulo">Voluntariados en el mapa</h2>
         <div className="vol-mapa-wrapper">
@@ -209,12 +263,12 @@ function Voluntariado() {
               >
                 <Popup>
                   <strong>
-                    {evento.emoji} {evento.title}
+                    {evento.emoji} {evento.titulo}
                   </strong>
                   <br />
                   📍 {evento.direccion}
                   <br />
-                  {formatearFecha(evento.date)} · {evento.hora}hs
+                  {formatearFecha(evento.fecha)} · {evento.hora}hs
                   <br />+{evento.bucles} bucles
                 </Popup>
               </Marker>
@@ -223,25 +277,33 @@ function Voluntariado() {
         </div>
       </div>
 
-      {/* Lista de eventos */}
       <div className="vol-seccion">
         <h2 className="vol-seccion-titulo">Próximos eventos</h2>
+
+        {cargando && <p className="vol-cargando">Cargando voluntariados...</p>}
+
+        {!cargando && eventos.length === 0 && (
+          <p className="vol-cargando">Todavía no hay voluntariados creados.</p>
+        )}
+
         <div className="vol-lista">
           {eventos.map((evento) => (
             <div key={evento.id} className="vol-evento">
               <div className="vol-fecha-col">
-                <span className="vol-fecha">{formatearFecha(evento.date)}</span>
+                <span className="vol-fecha">
+                  {formatearFecha(evento.fecha)}
+                </span>
                 <span className="vol-hora">🕐 {evento.hora}hs</span>
               </div>
 
               <div className="vol-emoji">{evento.emoji}</div>
 
               <div className="vol-info">
-                <h3>{evento.title}</h3>
-                <p>{evento.description}</p>
+                <h3>{evento.titulo}</h3>
+                <p>{evento.descripcion}</p>
                 <div className="vol-meta">
                   <span className="vol-anotados">
-                    👥 {evento.anotados} anotados
+                    👥 {evento.anotados || 0} anotados
                   </span>
                   <span className="vol-direccion">📍 {evento.direccion}</span>
                   <span className="bucles-badge">+{evento.bucles} bucles</span>
@@ -272,7 +334,6 @@ function Voluntariado() {
         </div>
       </div>
 
-      {/* Modal crear evento */}
       {modalAbierto && (
         <div
           className="vol-modal-overlay"
@@ -288,6 +349,12 @@ function Voluntariado() {
                 ✕
               </button>
             </div>
+
+            {!usuario && (
+              <p className="vol-form-error">
+                Necesitás iniciar sesión para crear un evento.
+              </p>
+            )}
 
             <div className="vol-form">
               <div className="vol-form-fila">
@@ -313,9 +380,9 @@ function Voluntariado() {
                   <input
                     type="text"
                     placeholder="Ej: Limpieza en Parque Batlle"
-                    value={form.title}
+                    value={form.titulo}
                     onChange={(e) =>
-                      setForm({ ...form, title: e.target.value })
+                      setForm({ ...form, titulo: e.target.value })
                     }
                   />
                 </div>
@@ -325,9 +392,9 @@ function Voluntariado() {
                 <label>Descripción</label>
                 <textarea
                   placeholder="Contá de qué se trata el evento..."
-                  value={form.description}
+                  value={form.descripcion}
                   onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
+                    setForm({ ...form, descripcion: e.target.value })
                   }
                 />
               </div>
@@ -352,8 +419,10 @@ function Voluntariado() {
                   <label>Fecha *</label>
                   <input
                     type="date"
-                    value={form.date}
-                    onChange={(e) => setForm({ ...form, date: e.target.value })}
+                    value={form.fecha}
+                    onChange={(e) =>
+                      setForm({ ...form, fecha: e.target.value })
+                    }
                   />
                 </div>
                 <div className="vol-form-grupo">
@@ -389,15 +458,21 @@ function Voluntariado() {
                 className="vol-btn-confirmar"
                 onClick={handleCrear}
                 disabled={
-                  !form.title ||
-                  !form.date ||
+                  !form.titulo ||
+                  !form.fecha ||
                   !form.hora ||
                   !form.bucles ||
                   !form.direccion ||
-                  buscandoDireccion
+                  buscandoDireccion ||
+                  creando ||
+                  !usuario
                 }
               >
-                {buscandoDireccion ? "Buscando dirección..." : "Crear evento"}
+                {buscandoDireccion
+                  ? "Buscando dirección..."
+                  : creando
+                    ? "Creando..."
+                    : "Crear evento"}
               </button>
             </div>
           </div>

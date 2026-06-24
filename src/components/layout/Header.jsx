@@ -1,4 +1,3 @@
-import { useAuth } from "../../controlers/AuthContext";
 import Home from "../../pages/Home";
 import Voluntariado from "../../pages/Voluntariado";
 import Tienda from "../../pages/Tienda";
@@ -8,8 +7,6 @@ import ComoFunciona from "../../pages/ComoFunciona";
 import BasadosEnDatos from "../../pages/BasadosEnDatos";
 import Login from "../../pages/Login";
 function Header({ seccionActiva = "home", setSeccionActiva }) {
-  const { usuario } = useAuth();
-
   const renderContenidoPrincipal = () => {
     switch (seccionActiva) {
       case "home":
@@ -27,11 +24,7 @@ function Header({ seccionActiva = "home", setSeccionActiva }) {
       case "login":
         return <Login onIngreso={() => setSeccionActiva("profile")} />;
       case "profile":
-        return usuario ? (
-          <MiPerfil />
-        ) : (
-          <Login onIngreso={() => setSeccionActiva("profile")} />
-        );
+        return <MiPerfil onNecesitaLogin={() => setSeccionActiva("login")} />;
       default:
         return <Home />;
     }
