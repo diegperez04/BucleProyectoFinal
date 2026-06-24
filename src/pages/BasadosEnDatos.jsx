@@ -3,7 +3,7 @@ function BasadosEnDatos() {
     <div>
       <div className="divprincipal">
         <div className="divizquierda">
-            <h1>Nos basamos en datos para cambiar nuestro sistema de reciclaj de residuos</h1>
+            <h1>Nos basamos en datos para cambiar nuestro sistema de reciclaje de residuos</h1>
         </div>
         <h2>Estadisticas Bucle</h2>
         <div className="divderecha">
