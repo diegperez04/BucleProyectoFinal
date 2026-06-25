@@ -62,9 +62,24 @@ function Voluntariado() {
     }
   };
 
+  const cargarMisAnotaciones = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/voluntariados/mis-anotaciones`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setAnotadoEn(data.map((a) => a.voluntariadoId));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     const t = setTimeout(() => {
       cargarEventos();
+      cargarMisAnotaciones();
     }, 0);
     return () => clearTimeout(t);
   }, []);
@@ -103,6 +118,32 @@ function Voluntariado() {
     } catch (err) {
       console.error(err);
       setErrorGeneral("Error de conexión al anotarse.");
+    }
+  };
+
+  const handleDesanotarse = async (id) => {
+    if (!usuario || !anotadoEn.includes(id)) return;
+    try {
+      const res = await fetch(`${API_URL}/voluntariados/${id}/desanotarse`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setErrorGeneral(data.error || "No se pudo desanotar.");
+        return;
+      }
+      setAnotadoEn(anotadoEn.filter((aId) => aId !== id));
+      setEventos(
+        eventos.map((e) =>
+          e.id === id
+            ? { ...e, anotados: Math.max((e.anotados || 1) - 1, 0) }
+            : e,
+        ),
+      );
+    } catch (err) {
+      console.error(err);
+      setErrorGeneral("Error de conexión al desanotarse.");
     }
   };
 
@@ -318,6 +359,16 @@ function Voluntariado() {
                 >
                   {anotadoEn.includes(evento.id) ? "✓ Anotado" : "Anotarme"}
                 </button>
+
+                {anotadoEn.includes(evento.id) && (
+                  <button
+                    className="btn-desanotarse"
+                    onClick={() => handleDesanotarse(evento.id)}
+                    title="Desanotarme de este voluntariado"
+                  >
+                    Desanotarme
+                  </button>
+                )}
 
                 {!evento.fijo && (
                   <button

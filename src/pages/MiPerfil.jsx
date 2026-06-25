@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../context/useAuth";
 import "./MiPerfil.css";
 
@@ -50,28 +50,21 @@ export default function MiPerfil({ onNecesitaLogin }) {
   });
 
   // ─── Cargar datos del usuario, historial y canastas al entrar ──
-  useEffect(() => {
-    if (!usuario) return;
-    refrescarUsuario();
-    cargarHistorial();
-    cargarMisCanastas();
-  }, []);
-
-  const refrescarUsuario = async () => {
+  const refrescarUsuario = useCallback(async () => {
     try {
       const res = await fetch(`${API_URL}/usuarios/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) return;
       const data = await res.json();
-      // actualizamos el usuario en el contexto global con el bucles al día
+
       setUsuario((prev) => ({ ...prev, ...data }));
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [token, setUsuario]);
 
-  const cargarHistorial = async () => {
+  const cargarHistorial = useCallback(async () => {
     setCargandoHistorial(true);
     try {
       const res = await fetch(`${API_URL}/voluntariados/mis-anotaciones`, {
@@ -84,9 +77,9 @@ export default function MiPerfil({ onNecesitaLogin }) {
     } finally {
       setCargandoHistorial(false);
     }
-  };
+  }, [token]);
 
-  const cargarMisCanastas = async () => {
+  const cargarMisCanastas = useCallback(async () => {
     setCargandoCanastas(true);
     try {
       const res = await fetch(`${API_URL}/canastas?usuarioId=${usuario.id}`);
@@ -97,10 +90,22 @@ export default function MiPerfil({ onNecesitaLogin }) {
     } finally {
       setCargandoCanastas(false);
     }
-  };
+  }, [usuario]);
+
+  useEffect(() => {
+    if (!usuario) return;
+    const t = setTimeout(() => {
+      refrescarUsuario();
+      cargarHistorial();
+      cargarMisCanastas();
+    }, 0);
+    return () => clearTimeout(t);
+  }, [usuario, refrescarUsuario, cargarHistorial, cargarMisCanastas]);
 
   const handleCambiarAvatar = async (emoji) => {
     setSelectorAvatarAbierto(false);
+
+    setUsuario((prev) => ({ ...prev, avatar: emoji }));
     try {
       const res = await fetch(`${API_URL}/usuarios/me/avatar`, {
         method: "PATCH",
@@ -110,9 +115,18 @@ export default function MiPerfil({ onNecesitaLogin }) {
         },
         body: JSON.stringify({ avatar: emoji }),
       });
-      if (!res.ok) return;
+      if (!res.ok) {
+        console.error("No se pudo guardar el avatar");
+        return;
+      }
       const data = await res.json();
+
       setUsuario((prev) => ({ ...prev, ...data }));
+
+      localStorage.setItem(
+        "bucle_usuario",
+        JSON.stringify({ ...usuario, ...data }),
+      );
     } catch (err) {
       console.error(err);
     }
@@ -176,7 +190,6 @@ export default function MiPerfil({ onNecesitaLogin }) {
 
   return (
     <div className="perfil-wrapper">
-      {/* Header del perfil */}
       <div className="perfil-header">
         <div className="perfil-avatar-wrapper">
           <button
@@ -214,7 +227,6 @@ export default function MiPerfil({ onNecesitaLogin }) {
         </button>
       </div>
 
-      {/* Tabs */}
       <div className="perfil-tabs">
         <button
           className={tab === "datos" ? "perfil-tab activo" : "perfil-tab"}
@@ -238,7 +250,6 @@ export default function MiPerfil({ onNecesitaLogin }) {
         </button>
       </div>
 
-      {/* Contenido según tab */}
       <div className="perfil-contenido">
         {tab === "datos" && (
           <div className="perfil-datos">
@@ -339,7 +350,6 @@ export default function MiPerfil({ onNecesitaLogin }) {
         )}
       </div>
 
-      {/* Modal crear canasta */}
       {modalCanastaAbierto && (
         <div
           className="perfil-modal-overlay"
