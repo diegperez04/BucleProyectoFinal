@@ -14,6 +14,7 @@ function CardProducto({
   bgColor = "verde",
   ecoTag,
   onCanjear,
+  canjeando = false,
 }) {
   return (
     <div className="card">
@@ -27,11 +28,10 @@ function CardProducto({
         {category && <p className="category">{category}</p>}
         <h3 className="title">{title}</h3>
         <div className="price-row">
-          <span className="price">$0</span>
           <span className="bucles">{bucles} ●</span>
         </div>
-        <button className="btn" onClick={onCanjear}>
-          Canjear
+        <button className="btn" onClick={onCanjear} disabled={canjeando}>
+          {canjeando ? "Canjeando..." : "Canjear"}
         </button>
       </div>
     </div>

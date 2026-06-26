@@ -5,8 +5,8 @@ import MiPerfil from "../../pages/MiPerfil";
 import Comunidad from "../../pages/Comunidad";
 import ComoFunciona from "../../pages/ComoFunciona";
 import BasadosEnDatos from "../../pages/BasadosEnDatos";
-
-function Header({ seccionActiva = "home" }) {
+import Login from "../../pages/Login";
+function Header({ seccionActiva = "home", setSeccionActiva }) {
   const renderContenidoPrincipal = () => {
     switch (seccionActiva) {
       case "home":
@@ -21,8 +21,12 @@ function Header({ seccionActiva = "home" }) {
         return <Comunidad />;
       case "databased":
         return <BasadosEnDatos />;
+      case "login":
+        return <Login onIngreso={() => setSeccionActiva("profile")} />;
       case "profile":
-        return <MiPerfil />;
+        return <MiPerfil onNecesitaLogin={() => setSeccionActiva("login")} />;
+      default:
+        return <Home />;
     }
   };
 

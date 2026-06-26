@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Header from "./components/layout/Header";
@@ -8,20 +9,25 @@ function App() {
   const [seccionActiva, setSeccionActiva] = useState("home");
 
   return (
-    <div>
-      <div className="Menu">
-        <Navbar
-          seccionActiva={seccionActiva}
-          setSeccionActiva={setSeccionActiva}
-        />
-      </div>
-      <div className="">
-        <Header seccionActiva={seccionActiva} />
-      </div>
+    <AuthProvider>
       <div>
-        <Footer />
+        <div className="Menu">
+          <Navbar
+            seccionActiva={seccionActiva}
+            setSeccionActiva={setSeccionActiva}
+          />
+        </div>
+        <div className="">
+          <Header
+            seccionActiva={seccionActiva}
+            setSeccionActiva={setSeccionActiva}
+          />
+        </div>
+        <div>
+          <Footer />
+        </div>
       </div>
-    </div>
+    </AuthProvider>
   );
 }
 
