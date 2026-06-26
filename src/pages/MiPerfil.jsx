@@ -12,9 +12,10 @@ function formatearFecha(fecha) {
   });
 }
 
-export default function MiPerfil({ onNecesitaLogin }) {
+function MiPerfil({ onNecesitaLogin }) {
   const { usuario, setUsuario, logout } = useAuth();
   const token = localStorage.getItem("bucle_token");
+  const usuarioId = usuario?.id;
 
   const [tab, setTab] = useState("datos");
 
@@ -49,21 +50,6 @@ export default function MiPerfil({ onNecesitaLogin }) {
     emoji: "🗑️",
   });
 
-  // ─── Cargar datos del usuario, historial y canastas al entrar ──
-  const refrescarUsuario = useCallback(async () => {
-    try {
-      const res = await fetch(`${API_URL}/usuarios/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-
-      setUsuario((prev) => ({ ...prev, ...data }));
-    } catch (err) {
-      console.error(err);
-    }
-  }, [token, setUsuario]);
-
   const cargarHistorial = useCallback(async () => {
     setCargandoHistorial(true);
     try {
@@ -82,7 +68,7 @@ export default function MiPerfil({ onNecesitaLogin }) {
   const cargarMisCanastas = useCallback(async () => {
     setCargandoCanastas(true);
     try {
-      const res = await fetch(`${API_URL}/canastas?usuarioId=${usuario.id}`);
+      const res = await fetch(`${API_URL}/canastas?usuarioId=${usuarioId}`);
       const data = await res.json();
       setCanastas(data);
     } catch (err) {
@@ -90,22 +76,19 @@ export default function MiPerfil({ onNecesitaLogin }) {
     } finally {
       setCargandoCanastas(false);
     }
-  }, [usuario]);
+  }, [usuarioId]);
 
   useEffect(() => {
-    if (!usuario) return;
-    const t = setTimeout(() => {
-      refrescarUsuario();
-      cargarHistorial();
-      cargarMisCanastas();
-    }, 0);
-    return () => clearTimeout(t);
-  }, [usuario, refrescarUsuario, cargarHistorial, cargarMisCanastas]);
+    if (!usuarioId) return;
+    cargarHistorial();
+    cargarMisCanastas();
+  }, [usuarioId, cargarHistorial, cargarMisCanastas]);
 
   const handleCambiarAvatar = async (emoji) => {
     setSelectorAvatarAbierto(false);
 
     setUsuario((prev) => ({ ...prev, avatar: emoji }));
+
     try {
       const res = await fetch(`${API_URL}/usuarios/me/avatar`, {
         method: "PATCH",
@@ -115,20 +98,20 @@ export default function MiPerfil({ onNecesitaLogin }) {
         },
         body: JSON.stringify({ avatar: emoji }),
       });
+
       if (!res.ok) {
-        console.error("No se pudo guardar el avatar");
+        const data = await res.json().catch(() => ({}));
+        console.error("No se pudo guardar el avatar:", data.error);
+        setErrorCanasta(data.error || "No se pudo guardar el avatar.");
         return;
       }
+
       const data = await res.json();
 
       setUsuario((prev) => ({ ...prev, ...data }));
-
-      localStorage.setItem(
-        "bucle_usuario",
-        JSON.stringify({ ...usuario, ...data }),
-      );
     } catch (err) {
       console.error(err);
+      setErrorCanasta("Error de conexión al cambiar el avatar.");
     }
   };
 
@@ -448,3 +431,4 @@ export default function MiPerfil({ onNecesitaLogin }) {
     </div>
   );
 }
+export default MiPerfil;

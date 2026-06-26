@@ -2,7 +2,7 @@ import { useAuth } from "../../context/useAuth";
 
 function Menu({ seccionActiva, setSeccionActiva }) {
   const { usuario } = useAuth();
-
+  console.log("Menu.jsx - usuario:", usuario);
   const menuItems = [
     { id: "home", label: "Inicio" },
     { id: "store", label: "Tienda" },
@@ -24,12 +24,18 @@ function Menu({ seccionActiva, setSeccionActiva }) {
         </li>
       ))}
 
+      {usuario && (
+        <li>
+          <span className="BuclesNavbar">🪙 {usuario.bucles ?? 0} bucles</span>
+        </li>
+      )}
+
       <li>
         <button
           onClick={() => setSeccionActiva(usuario ? "profile" : "login")}
           className={`BotonMenu ${seccionActiva === "profile" || seccionActiva === "login" ? "active" : ""}`}
         >
-          {usuario ? `Hola, ${usuario.nombre}` : "Ingresar"}
+          {usuario ? `${usuario.avatar ?? "🙂"} ${usuario.nombre}` : "Ingresar"}
         </button>
       </li>
     </ul>
