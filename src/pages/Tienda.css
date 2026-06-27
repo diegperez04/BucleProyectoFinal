@@ -1,6 +1,6 @@
 .tienda-hero {
   background-color: #0d5b47;
-  padding: 3rem 2.5rem;
+  padding: 48px 50px 0px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -10,6 +10,7 @@
 .tienda-hero-texto {
   color: white;
   max-width: 480px;
+  padding-bottom: 45px;
 }
 
 .tienda-eyebrow {
@@ -34,7 +35,7 @@
 }
 
 .tienda-hero-img img {
-  width: 380px;
+  width: 800px;
   max-width: 100%;
   object-fit: contain;
 }

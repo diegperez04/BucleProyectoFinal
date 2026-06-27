@@ -3,8 +3,7 @@ import { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext(null);
 
 const API_URL = "http://localhost:3000/api";
-
-export function AuthProvider({ children }) {
+function AuthProvider({ children }) {
   const [usuario, setUsuarioRaw] = useState(() => {
     try {
       const guardado = localStorage.getItem("bucle_usuario");
@@ -14,7 +13,6 @@ export function AuthProvider({ children }) {
     }
   });
 
-  // Único punto donde se escribe el estado Y el localStorage
   const setUsuario = (valorOFuncion) => {
     setUsuarioRaw((prev) => {
       const nuevo =
@@ -30,18 +28,29 @@ export function AuthProvider({ children }) {
     });
   };
 
-  // (bucles actualizados, avatar guardado, etc.)
-  useEffect(() => {
+  const refrescarUsuario = async () => {
     const token = localStorage.getItem("bucle_token");
     if (!token) return;
-    fetch(`${API_URL}/usuarios/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (data) setUsuario((prev) => ({ ...prev, ...data }));
-      })
-      .catch(() => {});
+    try {
+      const res = await fetch(`${API_URL}/usuarios/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      setUsuario(data);
+    } catch {
+      //
+    }
+  };
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void refrescarUsuario();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = async (email, password) => {
@@ -56,6 +65,8 @@ export function AuthProvider({ children }) {
 
       setUsuario(data.usuario);
       localStorage.setItem("bucle_token", data.token);
+      // bucles u punts actuali
+      await refrescarUsuario();
       return { ok: true };
     } catch (err) {
       return { ok: false, error: err.message };
@@ -87,9 +98,10 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ usuario, setUsuario, login, registro, logout }}
+      value={{ usuario, setUsuario, refrescarUsuario, login, registro, logout }}
     >
       {children}
     </AuthContext.Provider>
   );
 }
+export default AuthProvider;

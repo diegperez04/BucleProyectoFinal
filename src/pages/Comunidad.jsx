@@ -4,7 +4,7 @@ import "./Comunidad.css";
 
 const API_URL = "http://localhost:3000/api";
 
-// Genera un código de retiro aleatorio de 6 caracteres
+// código de retiro aleatorio de 6 caracteres
 function generarCodigo() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
@@ -19,7 +19,7 @@ function Comunidad() {
   const [errorGeneral, setErrorGeneral] = useState("");
 
   // Modal de confirmación de retiro
-  const [modalRetiro, setModalRetiro] = useState(null); // { canasta, codigo }
+  const [modalRetiro, setModalRetiro] = useState(null);
 
   const cargarCanastas = async () => {
     setCargando(true);
@@ -174,13 +174,13 @@ function Comunidad() {
 
               <div className="retiro-contacto">
                 <div className="retiro-dato">
-                  <span className="retiro-label">👤 Nombre</span>
+                  <span className="retiro-label">👤 </span>
                   <span className="retiro-valor">
                     {modalRetiro.canasta.usuario?.nombre || "—"}
                   </span>
                 </div>
                 <div className="retiro-dato">
-                  <span className="retiro-label">✉️ Email</span>
+                  <span className="retiro-label">✉️ </span>
                   <span className="retiro-valor retiro-email">
                     {modalRetiro.canasta.usuario?.email || "—"}
                   </span>

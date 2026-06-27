@@ -10,9 +10,9 @@ function Header({ seccionActiva = "home", setSeccionActiva }) {
   const renderContenidoPrincipal = () => {
     switch (seccionActiva) {
       case "home":
-        return <Home />;
-      case "about":
-        return <SobreNosotros />;
+        return <Home setSeccionActiva={setSeccionActiva} />;
+      case "operating":
+        return <ComoFunciona />;
       case "store":
         return <Tienda />;
       case "volunteering":
