@@ -1,10 +1,80 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/useAuth";
 import Card from "../components/ui/Card";
+import Cart from "../components/ui/Cart";
 import Tierra from "../assets/Tierra.png";
 import "./Tienda.css";
 
 const API_URL = "http://localhost:3000/api";
+
+const RECOMPENSAS_EJEMPLO = [
+  {
+    id: "ej-1",
+    emoji: "💧",
+    titulo: "Botella Ecológica",
+    categoria: "Productos sustentables",
+    descripcion: "Botella reutilizable de acero inoxidable 500ml.",
+    bucles: 300,
+    bgColor: "verde",
+    ecoTag: true,
+    esEjemplo: true,
+  },
+  {
+    id: "ej-2",
+    emoji: "🛍️",
+    titulo: "Tote Bag",
+    categoria: "Accesorios",
+    descripcion: "Bolsa de tela reutilizable, resistente y lavable.",
+    bucles: 280,
+    bgColor: "marron",
+    ecoTag: false,
+    esEjemplo: true,
+  },
+  {
+    id: "ej-3",
+    emoji: "🛒",
+    titulo: "Cupón 20% off en supermercado",
+    categoria: "Supermercado",
+    descripcion: "Descuento válido en cualquier compra de más de $500.",
+    bucles: 200,
+    bgColor: "verde",
+    ecoTag: true,
+    esEjemplo: true,
+  },
+  {
+    id: "ej-4",
+    emoji: "🧴",
+    titulo: "Kit limpieza ecológica",
+    categoria: "Hogar",
+    descripcion: "Productos de limpieza biodegradables para el hogar.",
+    bucles: 150,
+    bgColor: "mix",
+    ecoTag: false,
+    esEjemplo: true,
+  },
+  {
+    id: "ej-5",
+    emoji: "☕",
+    titulo: "Café gratis en Café Verde",
+    categoria: "Gastronomía",
+    descripcion: "Un café de especialidad para vos.",
+    bucles: 120,
+    bgColor: "marron",
+    ecoTag: true,
+    esEjemplo: true,
+  },
+  {
+    id: "ej-6",
+    emoji: "🌱",
+    titulo: "Plántula de árbol nativo",
+    categoria: "Naturaleza",
+    descripcion: "Una plántula de árbol nativo uruguayo para plantar en casa.",
+    bucles: 80,
+    bgColor: "verde",
+    ecoTag: true,
+    esEjemplo: true,
+  },
+];
 
 function Tienda() {
   const { usuario, setUsuario } = useAuth();
@@ -12,13 +82,16 @@ function Tienda() {
 
   const [recompensas, setRecompensas] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const [canjeando, setCanjeando] = useState(null); // id en proceso
   const [errorGeneral, setErrorGeneral] = useState("");
+
+  //carrito
+  const [carrito, setCarrito] = useState([]);
+  const [mostrarCarrito, setMostrarCarrito] = useState(false);
+  const [canjeandoCarrito, setCanjeandoCarrito] = useState(false);
 
   const [modalAbierto, setModalAbierto] = useState(false);
   const [publicando, setPublicando] = useState(false);
   const [errorPublicar, setErrorPublicar] = useState("");
-
   const [form, setForm] = useState({
     emoji: "🎁",
     titulo: "",
@@ -46,67 +119,76 @@ function Tienda() {
   };
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      cargarRecompensas();
-    }, 0);
+    const t = setTimeout(cargarRecompensas, 0);
     return () => clearTimeout(t);
   }, []);
 
-  const handleCanjear = async (recompensa) => {
-    if (!usuario) {
-      setErrorGeneral("Tenés que iniciar sesión para canjear.");
-      return;
-    }
-    if ((usuario.bucles || 0) < recompensa.bucles) {
-      setErrorGeneral("No tenés suficientes bucles para este canje.");
-      return;
-    }
+  const agregarAlCarrito = (item) => {
+    if (carrito.find((c) => c.id === item.id)) return;
+    setCarrito((prev) => [...prev, item]);
+    setMostrarCarrito(true);
+  };
 
-    setCanjeando(recompensa.id);
+  const eliminarDelCarrito = (id) => {
+    setCarrito((prev) => prev.filter((c) => c.id !== id));
+  };
+
+  const realizarCanje = async () => {
+    if (carrito.length === 0 || !usuario) return;
+
+    const itemsReales = carrito.filter((c) => !c.esEjemplo);
+    const itemsEjemplo = carrito.filter((c) => c.esEjemplo);
+
+    setCanjeandoCarrito(true);
     try {
-      const res = await fetch(
-        `${API_URL}/recompensas/${recompensa.id}/canjear`,
-        {
+      for (const item of itemsReales) {
+        const res = await fetch(`${API_URL}/recompensas/${item.id}/canjear`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-
-      if (!res.ok) {
-        const data = await res.json();
-        setErrorGeneral(data.error || "No se pudo canjear.");
-        return;
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          setErrorGeneral(data.error || "Error al canjear.");
+          return;
+        }
       }
 
-      // la recompensa canjeada ya no se muestra en la tienda
-      setRecompensas(recompensas.filter((r) => r.id !== recompensa.id));
+      if (itemsEjemplo.length > 0) {
+        const totalEjemplo = itemsEjemplo.reduce((acc, c) => acc + c.bucles, 0);
+        setUsuario((prev) => ({
+          ...prev,
+          bucles: (prev?.bucles || 0) - totalEjemplo,
+        }));
+      }
 
-      // refrescamos el saldo de bucles del usuario
-      const resUsuario = await fetch(`${API_URL}/usuarios/me`, {
+      if (itemsReales.length > 0) {
+        setRecompensas((prev) =>
+          prev.filter((r) => !itemsReales.find((i) => i.id === r.id)),
+        );
+      }
+
+      // refrescamos bucles desde el servidor
+      const resU = await fetch(`${API_URL}/usuarios/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (resUsuario.ok) {
-        const datosUsuario = await resUsuario.json();
-        setUsuario((prev) => ({ ...prev, ...datosUsuario }));
+      if (resU.ok) {
+        const du = await resU.json();
+        setUsuario((prev) => ({ ...prev, ...du }));
       }
+
+      setCarrito([]);
+      setMostrarCarrito(false);
+      alert("¡Canje realizado con éxito! 🎉");
     } catch (err) {
       console.error(err);
       setErrorGeneral("Error de conexión al canjear.");
     } finally {
-      setCanjeando(null);
+      setCanjeandoCarrito(false);
     }
   };
 
   const handlePublicar = async () => {
-    if (!form.titulo || !form.bucles) return;
-
-    if (!usuario) {
-      setErrorPublicar(
-        "Tenés que iniciar sesión para publicar una recompensa.",
-      );
-      return;
-    }
-
+    if (!form.titulo || !form.bucles || !usuario) return;
     setErrorPublicar("");
     setPublicando(true);
     try {
@@ -129,7 +211,7 @@ function Tienda() {
 
       if (!res.ok) {
         const data = await res.json();
-        setErrorPublicar(data.error || "No se pudo publicar la recompensa.");
+        setErrorPublicar(data.error || "No se pudo publicar.");
         return;
       }
 
@@ -152,6 +234,9 @@ function Tienda() {
       setPublicando(false);
     }
   };
+
+  const todasLasRecompensas =
+    recompensas.length > 0 ? recompensas : RECOMPENSAS_EJEMPLO;
 
   return (
     <div>
@@ -182,22 +267,28 @@ function Tienda() {
       <div className="tienda-seccion">
         <div className="tienda-seccion-header">
           <h2 className="tienda-seccion-titulo">Recompensas disponibles</h2>
-          <button
-            className="btn-nueva-recompensa"
-            onClick={() => setModalAbierto(true)}
+          <div
+            style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}
           >
-            + Publicar recompensa
-          </button>
+            <button
+              className="btn-carrito"
+              onClick={() => setMostrarCarrito(true)}
+            >
+              🛒 Carrito ({carrito.length})
+            </button>
+            <button
+              className="btn-nueva-recompensa"
+              onClick={() => setModalAbierto(true)}
+            >
+              + Publicar recompensa
+            </button>
+          </div>
         </div>
 
         {cargando && <p className="vol-cargando">Cargando tienda...</p>}
 
-        {!cargando && recompensas.length === 0 && (
-          <p className="vol-cargando">Todavía no hay recompensas publicadas.</p>
-        )}
-
         <div className="tienda-grid">
-          {recompensas.map((r) => (
+          {todasLasRecompensas.map((r) => (
             <Card
               key={r.id}
               type="producto"
@@ -207,12 +298,22 @@ function Tienda() {
               bucles={r.bucles}
               bgColor={r.bgColor}
               ecoTag={r.ecoTag}
-              onCanjear={() => handleCanjear(r)}
-              canjeando={canjeando === r.id}
+              enCarrito={!!carrito.find((c) => c.id === r.id)}
+              onCanjear={() => agregarAlCarrito(r)}
             />
           ))}
         </div>
       </div>
+
+      {mostrarCarrito && (
+        <Cart
+          carrito={carrito}
+          onEliminar={eliminarDelCarrito}
+          onCerrar={() => setMostrarCarrito(false)}
+          onCanjear={realizarCanje}
+          canjeando={canjeandoCarrito}
+        />
+      )}
 
       {modalAbierto && (
         <div

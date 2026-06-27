@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../context/useAuth";
 import "./MiPerfil.css";
 
@@ -12,9 +12,10 @@ function formatearFecha(fecha) {
   });
 }
 
-export default function MiPerfil({ onNecesitaLogin }) {
+function MiPerfil({ onNecesitaLogin }) {
   const { usuario, setUsuario, logout } = useAuth();
   const token = localStorage.getItem("bucle_token");
+  const usuarioId = usuario?.id;
 
   const [tab, setTab] = useState("datos");
 
@@ -49,29 +50,7 @@ export default function MiPerfil({ onNecesitaLogin }) {
     emoji: "🗑️",
   });
 
-  // ─── Cargar datos del usuario, historial y canastas al entrar ──
-  useEffect(() => {
-    if (!usuario) return;
-    refrescarUsuario();
-    cargarHistorial();
-    cargarMisCanastas();
-  }, []);
-
-  const refrescarUsuario = async () => {
-    try {
-      const res = await fetch(`${API_URL}/usuarios/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) return;
-      const data = await res.json();
-      // actualizamos el usuario en el contexto global con el bucles al día
-      setUsuario((prev) => ({ ...prev, ...data }));
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const cargarHistorial = async () => {
+  const cargarHistorial = useCallback(async () => {
     setCargandoHistorial(true);
     try {
       const res = await fetch(`${API_URL}/voluntariados/mis-anotaciones`, {
@@ -84,12 +63,12 @@ export default function MiPerfil({ onNecesitaLogin }) {
     } finally {
       setCargandoHistorial(false);
     }
-  };
+  }, [token]);
 
-  const cargarMisCanastas = async () => {
+  const cargarMisCanastas = useCallback(async () => {
     setCargandoCanastas(true);
     try {
-      const res = await fetch(`${API_URL}/canastas?usuarioId=${usuario.id}`);
+      const res = await fetch(`${API_URL}/canastas?usuarioId=${usuarioId}`);
       const data = await res.json();
       setCanastas(data);
     } catch (err) {
@@ -97,10 +76,19 @@ export default function MiPerfil({ onNecesitaLogin }) {
     } finally {
       setCargandoCanastas(false);
     }
-  };
+  }, [usuarioId]);
+
+  useEffect(() => {
+    if (!usuarioId) return;
+    cargarHistorial();
+    cargarMisCanastas();
+  }, [usuarioId, cargarHistorial, cargarMisCanastas]);
 
   const handleCambiarAvatar = async (emoji) => {
     setSelectorAvatarAbierto(false);
+
+    setUsuario((prev) => ({ ...prev, avatar: emoji }));
+
     try {
       const res = await fetch(`${API_URL}/usuarios/me/avatar`, {
         method: "PATCH",
@@ -110,11 +98,20 @@ export default function MiPerfil({ onNecesitaLogin }) {
         },
         body: JSON.stringify({ avatar: emoji }),
       });
-      if (!res.ok) return;
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.error("No se pudo guardar el avatar:", data.error);
+        setErrorCanasta(data.error || "No se pudo guardar el avatar.");
+        return;
+      }
+
       const data = await res.json();
+
       setUsuario((prev) => ({ ...prev, ...data }));
     } catch (err) {
       console.error(err);
+      setErrorCanasta("Error de conexión al cambiar el avatar.");
     }
   };
 
@@ -176,7 +173,6 @@ export default function MiPerfil({ onNecesitaLogin }) {
 
   return (
     <div className="perfil-wrapper">
-      {/* Header del perfil */}
       <div className="perfil-header">
         <div className="perfil-avatar-wrapper">
           <button
@@ -214,7 +210,6 @@ export default function MiPerfil({ onNecesitaLogin }) {
         </button>
       </div>
 
-      {/* Tabs */}
       <div className="perfil-tabs">
         <button
           className={tab === "datos" ? "perfil-tab activo" : "perfil-tab"}
@@ -238,7 +233,6 @@ export default function MiPerfil({ onNecesitaLogin }) {
         </button>
       </div>
 
-      {/* Contenido según tab */}
       <div className="perfil-contenido">
         {tab === "datos" && (
           <div className="perfil-datos">
@@ -339,7 +333,6 @@ export default function MiPerfil({ onNecesitaLogin }) {
         )}
       </div>
 
-      {/* Modal crear canasta */}
       {modalCanastaAbierto && (
         <div
           className="perfil-modal-overlay"
@@ -438,3 +431,4 @@ export default function MiPerfil({ onNecesitaLogin }) {
     </div>
   );
 }
+export default MiPerfil;

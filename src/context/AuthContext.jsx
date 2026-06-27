@@ -1,35 +1,57 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext(null);
 
 const API_URL = "http://localhost:3000/api";
-
-export function AuthProvider({ children }) {
-  // lee el usuario guardado una sola vez, al crear el estado
-  const [usuario, setUsuario] = useState(() => {
-    const guardado = localStorage.getItem("bucle_usuario");
-    return guardado ? JSON.parse(guardado) : null;
+function AuthProvider({ children }) {
+  const [usuario, setUsuarioRaw] = useState(() => {
+    try {
+      const guardado = localStorage.getItem("bucle_usuario");
+      return guardado ? JSON.parse(guardado) : null;
+    } catch {
+      return null;
+    }
   });
-  const [cargando] = useState(false);
 
-  // cada vez que se actualiza el usuario (ej: refrescar bucles), lo persistimos también.
-  // Si los datos son exactamente iguales a los que ya había, devolvemos el mismo objeto
-  // anterior (sin crear uno nuevo) para que React no dispare un re-render en cadena.
-  const actualizarUsuario = (valorOFuncion) => {
-    setUsuario((prev) => {
+  const setUsuario = (valorOFuncion) => {
+    setUsuarioRaw((prev) => {
       const nuevo =
         typeof valorOFuncion === "function"
           ? valorOFuncion(prev)
           : valorOFuncion;
-
-      if (prev && nuevo && JSON.stringify(prev) === JSON.stringify(nuevo)) {
-        return prev; // sin cambios reales, no generamos una nueva referencia
+      if (nuevo) {
+        localStorage.setItem("bucle_usuario", JSON.stringify(nuevo));
+      } else {
+        localStorage.removeItem("bucle_usuario");
       }
-
-      if (nuevo) localStorage.setItem("bucle_usuario", JSON.stringify(nuevo));
       return nuevo;
     });
   };
+
+  const refrescarUsuario = async () => {
+    const token = localStorage.getItem("bucle_token");
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/usuarios/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      setUsuario(data);
+    } catch {
+      //
+    }
+  };
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void refrescarUsuario();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const login = async (email, password) => {
     try {
@@ -41,8 +63,9 @@ export function AuthProvider({ children }) {
       if (!res.ok) throw new Error("Credenciales inválidas");
       const data = await res.json();
       setUsuario(data.usuario);
-      localStorage.setItem("bucle_usuario", JSON.stringify(data.usuario));
       localStorage.setItem("bucle_token", data.token);
+      // bucles u punts actuali
+      await refrescarUsuario();
       return { ok: true };
     } catch (err) {
       return { ok: false, error: err.message };
@@ -59,7 +82,6 @@ export function AuthProvider({ children }) {
       if (!res.ok) throw new Error("No se pudo crear la cuenta");
       const data = await res.json();
       setUsuario(data.usuario);
-      localStorage.setItem("bucle_usuario", JSON.stringify(data.usuario));
       localStorage.setItem("bucle_token", data.token);
       return { ok: true };
     } catch (err) {
@@ -68,23 +90,17 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    setUsuario(null);
+    setUsuarioRaw(null);
     localStorage.removeItem("bucle_usuario");
     localStorage.removeItem("bucle_token");
   };
 
   return (
     <AuthContext.Provider
-      value={{
-        usuario,
-        setUsuario: actualizarUsuario,
-        login,
-        registro,
-        logout,
-        cargando,
-      }}
+      value={{ usuario, setUsuario, refrescarUsuario, login, registro, logout }}
     >
       {children}
     </AuthContext.Provider>
   );
 }
+export default AuthProvider;
