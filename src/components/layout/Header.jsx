@@ -3,7 +3,7 @@ import Voluntariado from "../../pages/Voluntariado";
 import Tienda from "../../pages/Tienda";
 import MiPerfil from "../../pages/MiPerfil";
 import Comunidad from "../../pages/Comunidad";
-import ComoFunciona from "../../pages/ComoFunciona";
+import SobreNosotros from "../../pages/SobreNosotros";
 import BasadosEnDatos from "../../pages/BasadosEnDatos";
 import Login from "../../pages/Login";
 function Header({ seccionActiva = "home", setSeccionActiva }) {

@@ -8,7 +8,7 @@ function Menu({ seccionActiva, setSeccionActiva }) {
     { id: "store", label: "Tienda" },
     { id: "volunteering", label: "Voluntariado" },
     { id: "community", label: "Comunidad" },
-    { id: "operating", label: "Como Funciona" },
+    { id: "about", label: "Sobre Nosotros" },
   ];
 
   return (

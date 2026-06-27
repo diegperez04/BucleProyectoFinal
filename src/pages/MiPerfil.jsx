@@ -109,6 +109,11 @@ function MiPerfil({ onNecesitaLogin }) {
       const data = await res.json();
 
       setUsuario((prev) => ({ ...prev, ...data }));
+
+      localStorage.setItem(
+        "bucle_usuario",
+        JSON.stringify({ ...usuario, ...data }),
+      );
     } catch (err) {
       console.error(err);
       setErrorCanasta("Error de conexión al cambiar el avatar.");

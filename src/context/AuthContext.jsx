@@ -62,6 +62,7 @@ function AuthProvider({ children }) {
       });
       if (!res.ok) throw new Error("Credenciales inválidas");
       const data = await res.json();
+
       setUsuario(data.usuario);
       localStorage.setItem("bucle_token", data.token);
       // bucles u punts actuali
