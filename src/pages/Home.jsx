@@ -1,6 +1,6 @@
 import "./Home.css";
 
-function Home() {
+function Home({ setSeccionActiva }) {
   const progreso = [
     { label: "Plástico", kg: 4.2, porcentaje: 70 },
     { label: "Papel y cartón", kg: 2.8, porcentaje: 46 },
@@ -25,8 +25,18 @@ function Home() {
             beneficios para tu vida diaria mientras cuidas el planeta.
           </p>
           <div className="botones-home">
-            <button className="btn-home-main">Empezar a reciclar →</button>
-            <button className="btn-home-sec">Ver la tienda</button>
+            <button
+              onClick={() => setSeccionActiva("community")}
+              className="btn-home-main"
+            >
+              Empezar a reciclar →
+            </button>
+            <button
+              onClick={() => setSeccionActiva("store")}
+              className="btn-home-sec"
+            >
+              Ver la tienda
+            </button>
           </div>
           <div className="home-stats">
             <div className="stat">
