@@ -1,0 +1,517 @@
+.sobre-nosotros {
+  background: #faf7f2;
+}
+
+/* ─── Hero ────────────────────────────────────────── */
+.sobre-hero {
+  background: linear-gradient(135deg, #0d5b47 0%, #1a7a60 60%, #0d4a38 100%);
+  padding: 5rem 2.5rem;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.sobre-hero::before {
+  content: "";
+  position: absolute;
+  right: -100px;
+  top: -100px;
+  width: 400px;
+  height: 400px;
+  border: 70px solid rgba(255, 255, 255, 0.04);
+  border-radius: 50%;
+}
+
+.sobre-hero h1 {
+  font-size: 44px;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.sobre-hero p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.85);
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Secciones generales ─────────────────────────── */
+.sobre-seccion {
+  padding: 4rem 2.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sobre-seccion h2 {
+  font-size: 30px;
+  font-weight: 600;
+  color: #1c2b26;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* ─── Visión ──────────────────────────────────────── */
+.vision-contenido p {
+  font-size: 17px;
+  line-height: 1.8;
+  color: #4a6b5e;
+  margin-bottom: 1.25rem;
+  text-align: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ─── Vida Digna ──────────────────────────────────── */
+.vida-seccion {
+  max-width: 900px;
+}
+
+.vida-intro,
+.vida-texto {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #4a6b5e;
+  text-align: center;
+  margin: 0 auto 1.75rem;
+}
+
+.vida-cita {
+  background: #eaf4ec;
+  border-left: 5px solid #0d5b47;
+  border-radius: 0 12px 12px 0;
+  padding: 1.75rem 2rem;
+  margin: 2rem auto;
+  max-width: 760px;
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.6;
+  color: #1c2b26;
+}
+
+.vida-cita cite {
+  display: block;
+  margin-top: 1rem;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  color: #0d5b47;
+}
+
+.vida-pilares-titulo {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1c2b26;
+  margin: 3rem 0 1.75rem;
+}
+
+.vida-pilares {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.vida-pilar {
+  background: white;
+  border: 1px solid #e0ece7;
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.vida-pilar:hover {
+  box-shadow: 0 8px 24px rgba(13, 91, 71, 0.1);
+  transform: translateY(-4px);
+}
+
+.vida-pilar-emoji {
+  font-size: 38px;
+  display: block;
+  margin-bottom: 0.85rem;
+}
+
+.vida-pilar h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1c2b26;
+  margin: 0 0 0.6rem;
+}
+
+.vida-pilar p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #4a6b5e;
+  margin: 0;
+}
+
+.vida-cierre {
+  text-align: center;
+  font-size: 17px;
+  line-height: 1.7;
+  color: #0d5b47;
+  font-weight: 500;
+  max-width: 720px;
+  margin: 2.5rem auto 0;
+}
+
+/* ─── El problema ─────────────────────────────────── */
+.problema-seccion {
+  background: white;
+  max-width: 100%;
+}
+
+.problema-intro {
+  text-align: center;
+  font-size: 16px;
+  color: #4a6b5e;
+  max-width: 720px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.7;
+}
+
+.problema-galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.problema-foto {
+  margin: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(13, 91, 71, 0.1);
+}
+
+.problema-foto img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.problema-foto figcaption {
+  padding: 0.85rem 1rem;
+  font-size: 13px;
+  color: #4a6b5e;
+  background: #f5faf7;
+  text-align: center;
+}
+
+/* ─── Materias ────────────────────────────────────── */
+.materias-intro {
+  text-align: center;
+  font-size: 16px;
+  color: #4a6b5e;
+  max-width: 700px;
+  margin: 0 auto 3rem;
+  line-height: 1.7;
+}
+
+.materia-bloque {
+  background: white;
+  border: 1px solid #e0ece7;
+  border-radius: 18px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.materia-pendiente {
+  opacity: 0.85;
+  border-style: dashed;
+}
+
+.materia-encabezado {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.materia-icono {
+  font-size: 38px;
+  background: #eaf4ec;
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.materia-encabezado h3 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1c2b26;
+  margin: 0;
+}
+
+.materia-subtitulo {
+  font-size: 13px;
+  color: #0d5b47;
+  font-weight: 500;
+  margin: 0.2rem 0 0;
+}
+
+.materia-texto {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #4a6b5e;
+  margin-bottom: 2rem;
+}
+
+/* ─── Gráficas ────────────────────────────────────── */
+.graficas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.grafica-card {
+  background: #faf7f2;
+  border: 1px solid #e0ece7;
+  border-radius: 14px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.grafica-card h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1c2b26;
+  margin: 0 0 0.35rem;
+}
+
+.grafica-tipo {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #0d5b47;
+  background: #eaf4ec;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+}
+
+.grafica-nota {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #4a6b5e;
+  margin-top: 1rem;
+}
+
+/* ─── Programación (stack) ────────────────────────── */
+.prog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.prog-card {
+  background: #faf7f2;
+  border: 1px solid #e0ece7;
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+.prog-card h4 {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1c2b26;
+  margin: 0 0 0.75rem;
+}
+
+.prog-card p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #4a6b5e;
+  margin: 0 0 1rem;
+}
+
+.prog-card strong {
+  color: #0d5b47;
+}
+
+.prog-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.prog-tags span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0d5b47;
+  background: #eaf4ec;
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+/* ─── Equipo ──────────────────────────────────────── */
+.equipo-intro {
+  text-align: center;
+  font-size: 16px;
+  color: #4a6b5e;
+  margin-bottom: 2.5rem;
+}
+
+.equipo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.equipo-card {
+  background: white;
+  border: 1px solid #e0ece7;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.equipo-card:hover {
+  box-shadow: 0 8px 24px rgba(13, 91, 71, 0.12);
+  transform: translateY(-4px);
+}
+
+.equipo-foto {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 1.25rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #a8d4c5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eaf4ec;
+}
+
+.equipo-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.equipo-emoji {
+  font-size: 56px;
+}
+
+.equipo-card h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1c2b26;
+  margin-bottom: 0.35rem;
+}
+
+.equipo-rol {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0d5b47;
+  margin-bottom: 1rem;
+}
+
+.equipo-descripcion {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #4a6b5e;
+}
+
+/* ─── Académico ───────────────────────────────────── */
+.academico-seccion {
+  background: linear-gradient(135deg, #0d5b47 0%, #1a7a60 100%);
+  max-width: 100%;
+  color: white;
+}
+
+.academico-seccion h2 {
+  color: white;
+}
+
+.academico-contenido {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.academico-contenido p {
+  font-size: 16px;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1rem;
+}
+
+.academico-contenido strong {
+  color: #a8d4c5;
+}
+
+/* ─── Valores ─────────────────────────────────────── */
+.valores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.valor-card {
+  background: white;
+  border: 1px solid #e0ece7;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.valor-card:hover {
+  box-shadow: 0 8px 24px rgba(13, 91, 71, 0.1);
+  transform: translateY(-4px);
+}
+
+.valor-emoji {
+  font-size: 40px;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.valor-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1c2b26;
+  margin-bottom: 0.75rem;
+}
+
+.valor-card p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4a6b5e;
+}
+
+/* ─── Responsive ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .sobre-hero {
+    padding: 3.5rem 1.5rem;
+  }
+
+  .sobre-hero h1 {
+    font-size: 32px;
+  }
+
+  .sobre-seccion {
+    padding: 3rem 1.5rem;
+  }
+
+  .impacto-datos {
+    gap: 2rem;
+  }
+}
