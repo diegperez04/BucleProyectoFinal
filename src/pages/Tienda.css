@@ -79,3 +79,14 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 1.25rem;
 }
+
+.btn-carrito {
+  background: #0d5b47;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}

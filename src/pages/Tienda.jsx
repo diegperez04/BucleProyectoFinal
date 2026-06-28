@@ -274,7 +274,7 @@ function Tienda() {
               className="btn-carrito"
               onClick={() => setMostrarCarrito(true)}
             >
-              🛒 Carrito ({carrito.length})
+              🛒 ({carrito.length})
             </button>
             <button
               className="btn-nueva-recompensa"

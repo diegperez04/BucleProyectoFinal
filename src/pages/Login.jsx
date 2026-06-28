@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/useAuth";
 import "./Login.css";
-import logoBucle from "../assets/BUCLE03-02.jpg";
+import logoBucle from "../assets/BUCLE-02-02.jpg";
 function Login({ onIngreso }) {
   const { login, registro } = useAuth();
   const [modo, setModo] = useState("login");

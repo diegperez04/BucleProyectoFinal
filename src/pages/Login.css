@@ -28,12 +28,12 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-bottom: 1.75rem;
+  margin-bottom: 2.5rem;
 }
 
 .login-logo-img {
-  width: 48px;
-  height: 48px;
+  width: 150px;
+  height: 150px;
   object-fit: contain;
   border-radius: 50%;
 }

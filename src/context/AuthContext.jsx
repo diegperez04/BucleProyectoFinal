@@ -3,7 +3,7 @@ import { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext(null);
 
 const API_URL = "http://localhost:3000/api";
-function AuthProvider({ children }) {
+export function AuthProvider({ children }) {
   const [usuario, setUsuarioRaw] = useState(() => {
     try {
       const guardado = localStorage.getItem("bucle_usuario");
