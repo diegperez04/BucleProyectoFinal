@@ -4,23 +4,23 @@ import Tienda from "../../pages/Tienda";
 import MiPerfil from "../../pages/MiPerfil";
 import Comunidad from "../../pages/Comunidad";
 import SobreNosotros from "../../pages/SobreNosotros";
-import BasadosEnDatos from "../../pages/BasadosEnDatos";
+
 import Login from "../../pages/Login";
+
 function Header({ seccionActiva = "home", setSeccionActiva }) {
   const renderContenidoPrincipal = () => {
     switch (seccionActiva) {
       case "home":
         return <Home setSeccionActiva={setSeccionActiva} />;
-      case "operating":
-        return <ComoFunciona />;
+
       case "store":
         return <Tienda />;
       case "volunteering":
         return <Voluntariado />;
       case "community":
         return <Comunidad />;
-      case "databased":
-        return <BasadosEnDatos />;
+      case "about":
+        return <SobreNosotros />;
       case "login":
         return <Login onIngreso={() => setSeccionActiva("profile")} />;
       case "profile":

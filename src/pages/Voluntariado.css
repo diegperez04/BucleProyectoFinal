@@ -401,3 +401,19 @@
   background: #a0b0aa;
   cursor: not-allowed;
 }
+.vol-btn-cancelar {
+  flex: 1;
+  padding: 10px 22px;
+  border-radius: 20px;
+  border: 1.5px solid #5ab89f;
+  background: transparent;
+  color: #5ab89f;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.vol-btn-cancelar:hover {
+  background: #d4f0e9;
+  color: #5ab89f;
+}

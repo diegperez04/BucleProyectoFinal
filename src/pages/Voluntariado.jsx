@@ -500,7 +500,7 @@ function Voluntariado() {
 
             <div className="vol-modal-actions">
               <button
-                className="vol-btn-cancel"
+                className="vol-btn-cancelar"
                 onClick={() => setModalAbierto(false)}
               >
                 Cancelar

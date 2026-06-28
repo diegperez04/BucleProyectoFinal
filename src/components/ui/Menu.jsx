@@ -1,4 +1,5 @@
 import { useAuth } from "../../context/useAuth";
+import logoBucle from "../../assets/BUCLE-02-03.png";
 
 function Menu({ seccionActiva, setSeccionActiva }) {
   const { usuario } = useAuth();
@@ -26,7 +27,10 @@ function Menu({ seccionActiva, setSeccionActiva }) {
 
       {usuario && (
         <li>
-          <span className="BuclesNavbar">🪙 {usuario.bucles ?? 0} bucles</span>
+          <span className="BuclesNavbar">
+            <img src={logoBucle} alt="Bucles" className="bucles-icon" />
+            {usuario.bucles ?? 0} bucles
+          </span>
         </li>
       )}
 

@@ -40,8 +40,8 @@ body {
 }
 
 .BuclesNavbar {
-  background: #0d5b46;
-  color: white;
+  background: white;
+  color: #0d5b47;
   padding: 8px 14px;
   border-radius: 10px;
   font-size: 14px;
@@ -49,4 +49,12 @@ body {
   margin: 10px 5px;
   display: inline-flex;
   align-items: center;
+  gap: 8px;
+}
+
+.bucles-icon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 50%;
 }
